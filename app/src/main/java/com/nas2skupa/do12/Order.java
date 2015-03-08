@@ -18,6 +18,8 @@ public class Order {
     public String proName;
     public String userId;
     public String serviceId;
+    public String serviceName;
+    public String servicePrice;
     public Date date;
     public Date startTime;
     public Date endTime;
@@ -36,6 +38,8 @@ public class Order {
             this.proName = jsonObj.optString("proName");
             this.userId = jsonObj.optString("userId");
             this.serviceId = jsonObj.optString("serviceId");
+            this.serviceName = jsonObj.optString("serviceName");
+            this.servicePrice = jsonObj.optString("servicePrice");
             this.date = df.parse(jsonObj.optString("date"));
             this.startTime = tf.parse(jsonObj.optString("startTime"));
             this.endTime = tf.parse(jsonObj.optString("endTime"));

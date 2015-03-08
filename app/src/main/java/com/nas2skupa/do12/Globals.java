@@ -9,17 +9,21 @@ public class Globals extends Application {
 
     static LinkedHashMap<String, City> cities = new LinkedHashMap<String, City>();
 
-    static ArrayList<String> getCities() {
+    static ArrayList<String> getCities(int i) {
         ArrayList<String> ret = new ArrayList<String>();
-        ret.add("Svi gradovi");
+        if (i!=1) {
+            ret.add("Svi gradovi");
+        }
         for (City city : cities.values())
             ret.add(city.name);
         return ret;
     }
 
-    static ArrayList<String> getDistricts(String city) {
+    static ArrayList<String> getDistricts(String city, int i) {
         ArrayList<String> ret = new ArrayList<String>();
-        ret.add("Svi kvartovi");
+        if (i!=1) {
+            ret.add("Svi kvartovi");
+        }
         if (cities.containsKey(city))
             for (District district : cities.get(city).districts.values())
                 ret.add(district.name);
@@ -33,7 +37,7 @@ public class Globals extends Application {
         switch (CatId) {
 
             case 1:
-                catSettings[0] = "zdrastvene usluge";
+                catSettings[0] = "zdravstvene usluge";
                 catSettings[1] = "#7ec5c4";
                 return catSettings;
             case 2:
@@ -42,11 +46,11 @@ public class Globals extends Application {
                 return catSettings;
             case 3:
                 catSettings[0] = "ljepota";
-                catSettings[1] = "#f5b2b5";
+                catSettings[1] = "#a80364";
                 return catSettings;
             case 4:
                 catSettings[0] = "intelektualne usluge";
-                catSettings[1] = "#fad12f";
+                catSettings[1] = "#49019a";
                 return catSettings;
             case 5:
                 catSettings[0] = "dom i obitelj";

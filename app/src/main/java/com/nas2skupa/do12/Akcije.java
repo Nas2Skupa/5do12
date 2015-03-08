@@ -77,7 +77,7 @@ public class Akcije extends BaseActivity {
             }
         });
 
-        CitiesFilter citiesFilter = new CitiesFilter(this, (Spinner) findViewById(R.id.cities), (Spinner) findViewById(R.id.districts));
+        CitiesFilter citiesFilter = new CitiesFilter(this, (Spinner) findViewById(R.id.cities), (Spinner) findViewById(R.id.districts),0);
         citiesFilter.setOnFilterChangedListener(new CitiesFilter.OnFilterChangedListener() {
             @Override
             public void onFilterChanged(String city, String district) {
@@ -91,7 +91,7 @@ public class Akcije extends BaseActivity {
                     if (districtObj != null)
                         builder.appendQueryParameter("qid", districtObj.id);
                 }
-                new HttpRequest(context, builder.build()).setOnHttpResultListener(new HttpRequest.OnHttpResultListener() {
+                new HttpRequest(context, builder.build(), false).setOnHttpResultListener(new HttpRequest.OnHttpResultListener() {
                     @Override
                     public void onHttpResult(String result) {
                         parseServerResult(result);
@@ -116,7 +116,7 @@ public class Akcije extends BaseActivity {
                 int fav = R.drawable.blank;
                 int akcija = R.drawable.blank;
                 if (favore.equals("1")) {
-                    fav = R.drawable.fav_icon;
+                    fav = R.drawable.fav_icon_enabled;
                 }
                 if (action.equals("1")) {
                     akcija = R.drawable.akcija_icon;

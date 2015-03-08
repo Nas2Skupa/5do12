@@ -62,7 +62,7 @@ public class Favorites extends BaseActivity {
         // Calling async task to get json
         new GetProvider().execute();
         header = (View)getLayoutInflater().inflate(R.layout.listview_header_row, null);
-        getSubCatSettings("favorites", "#CC3333", header);
+        getSubCatSettings("favoriti", "#CC3333", header);
 
         listView1 = (ListView)findViewById(R.id.listView1);
      // Listview on item click listener
@@ -146,7 +146,7 @@ public class Favorites extends BaseActivity {
                         int fav=R.drawable.blank;
                         int akcija=R.drawable.blank;
                         if(favore.equals("1")){
-                        	fav=R.drawable.fav_icon;
+                        	fav=R.drawable.fav_icon_enabled;
                         }
                         if(action.equals("1")){
                         	akcija=R.drawable.akcija_icon;

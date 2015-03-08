@@ -4,7 +4,8 @@
     android:layout_height="match_parent"
     android:padding="8dp"
     android:showDividers="middle"
-    android:dividerPadding="8dp">
+    android:dividerPadding="8dp"
+    android:clickable="true">
 
     <Spinner
         android:id="@+id/cities"

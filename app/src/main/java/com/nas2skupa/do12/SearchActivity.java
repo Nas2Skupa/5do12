@@ -58,7 +58,7 @@ public class SearchActivity extends BaseActivity {
         filter = getLayoutInflater().inflate(R.layout.listview_filter_row, null);
         adapter = new ProviderAdapter(this, R.layout.listview_item_row, listArray);
         preferences = getSharedPreferences("user", Context.MODE_PRIVATE);
-        getSubCatSettings("Pretraživanje", "#8b00db", header);
+        getSubCatSettings("Pretraživanje", "#adbb00", header);
 
         listView1 = (ListView) findViewById(R.id.listView1);
         listView1.addHeaderView(header);
@@ -83,7 +83,7 @@ public class SearchActivity extends BaseActivity {
             }
         });
 
-        CitiesFilter citiesFilter = new CitiesFilter(this, (Spinner) findViewById(R.id.cities), (Spinner) findViewById(R.id.districts));
+        CitiesFilter citiesFilter = new CitiesFilter(this, (Spinner) findViewById(R.id.cities), (Spinner) findViewById(R.id.districts),0);
         citiesFilter.setOnFilterChangedListener(new CitiesFilter.OnFilterChangedListener() {
             @Override
             public void onFilterChanged(String city, String district) {
@@ -98,7 +98,7 @@ public class SearchActivity extends BaseActivity {
                     if (districtObj != null)
                         builder.appendQueryParameter("qid", districtObj.id);
                 }
-                new HttpRequest(context, builder.build()).setOnHttpResultListener(new HttpRequest.OnHttpResultListener() {
+                new HttpRequest(context, builder.build(), false).setOnHttpResultListener(new HttpRequest.OnHttpResultListener() {
                     @Override
                     public void onHttpResult(String result) {
                         parseServerResult(result);
@@ -117,12 +117,13 @@ public class SearchActivity extends BaseActivity {
                 JSONObject c = providers.getJSONObject(i);
                 String id = c.getString(TAG_ID);
                 String name = c.getString(TAG_NAME);
+                String catID = c.getString("category");
                 String favore = c.getString("favorite");
                 String action = c.getString("akcija");
                 int fav = R.drawable.blank;
                 int akcija = R.drawable.blank;
                 if (favore.equals("1")) {
-                    fav = R.drawable.fav_icon;
+                    fav = R.drawable.fav_icon_enabled;
                 }
                 if (action.equals("1")) {
                     akcija = R.drawable.akcija_icon;
@@ -132,7 +133,7 @@ public class SearchActivity extends BaseActivity {
                     rating = Float.parseFloat(c.getString("rating"));
                 } catch (NumberFormatException e) {
                 }
-                ProviderClass currProvider = new ProviderClass(id, name, favore, null, fav, akcija, rating);
+                ProviderClass currProvider = new ProviderClass(id, name, favore, catID, fav, akcija, rating);
                 listArray.add(currProvider);
             }
         } catch (JSONException e) {

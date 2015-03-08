@@ -1,8 +1,10 @@
 package com.nas2skupa.do12;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -14,7 +16,11 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RadioGroup;
 import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -24,6 +30,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Stack;
 
 public class ProviderList extends BaseActivity {
 
@@ -43,6 +51,7 @@ public class ProviderList extends BaseActivity {
     JSONArray providers = null;
     View header = null;
     View filter = null;
+    ImageView listSettingsBtn;
     private Context context;
     private ProviderAdapter adapter;
     private SharedPreferences preferences;
@@ -85,7 +94,16 @@ public class ProviderList extends BaseActivity {
             }
         });
 
-        CitiesFilter citiesFilter = new CitiesFilter(this, (Spinner) findViewById(R.id.cities), (Spinner) findViewById(R.id.districts));
+        listSettingsBtn = (ImageView) findViewById(R.id.listSettingsBtn);
+        listSettingsBtn.setVisibility(View.VISIBLE);
+        listSettingsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showListSettingDialog();
+            }
+        });
+
+        CitiesFilter citiesFilter = new CitiesFilter(this, (Spinner) findViewById(R.id.cities), (Spinner) findViewById(R.id.districts), 0);
         citiesFilter.setOnFilterChangedListener(new CitiesFilter.OnFilterChangedListener() {
             @Override
             public void onFilterChanged(String city, String district) {
@@ -100,7 +118,7 @@ public class ProviderList extends BaseActivity {
                     if (districtObj != null)
                         builder.appendQueryParameter("qid", districtObj.id);
                 }
-                new HttpRequest(context, builder.build()).setOnHttpResultListener(new HttpRequest.OnHttpResultListener() {
+                new HttpRequest(context, builder.build(), false).setOnHttpResultListener(new HttpRequest.OnHttpResultListener() {
                     @Override
                     public void onHttpResult(String result) {
                         parseServerResult(result);
@@ -108,6 +126,64 @@ public class ProviderList extends BaseActivity {
                 });
             }
         });
+    }
+
+    private Stack<Integer> checkedItems = new Stack<Integer>();
+
+    public void showListSettingDialog() {
+        AlertDialog dialog = new AlertDialog.Builder(context)
+                .setTitle("Poredaj pružatelje usluga")
+                .setView(getLayoutInflater().inflate(R.layout.list_settings, null))
+                .setPositiveButton("Primjeni", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, int which) {
+                        checkedItems.clear();
+                        CheckBox actions = (CheckBox) ((AlertDialog) dialog).findViewById(R.id.akcijeChbox);
+                        if (actions.isChecked()) {
+                            ArrayList<ProviderClass> filteredList = new ArrayList<ProviderClass>();
+                            for (ProviderClass provider : listArray)
+                                if (provider.akcijaIcon == R.drawable.akcija_icon)
+                                    filteredList.add(provider);
+                            adapter = new ProviderAdapter(context, R.layout.listview_item_row, filteredList);
+                            checkedItems.push(R.id.akcijeChbox);
+                        } else
+                            adapter = new ProviderAdapter(context, R.layout.listview_item_row, listArray);
+
+                        RadioGroup radioGroup = (RadioGroup) ((AlertDialog) dialog).findViewById(R.id.sortGrp);
+                        switch (radioGroup.getCheckedRadioButtonId()) {
+                            case R.id.nazivRbtn:
+                                adapter.sort(new Comparator<ProviderClass>() {
+                                    public int compare(ProviderClass o1, ProviderClass o2) {
+                                        return o1.proName.compareTo(o2.proName);
+                                    }
+                                });
+                                checkedItems.push(R.id.nazivRbtn);
+                                break;
+                            case R.id.najnovijeRbtn:
+                                adapter.sort(new Comparator<ProviderClass>() {
+                                    public int compare(ProviderClass o1, ProviderClass o2) {
+                                        return Integer.valueOf(o2.proID) - Integer.valueOf(o1.proID);
+                                    }
+                                });
+                                checkedItems.push(R.id.najnovijeRbtn);
+                                break;
+                            case R.id.ocjeneRbtn:
+                                adapter.sort(new Comparator<ProviderClass>() {
+                                    public int compare(ProviderClass o1, ProviderClass o2) {
+                                        if (o2.rating > o1.rating) return 1;
+                                        else if (o2.rating < o1.rating) return -1;
+                                        else return 0;
+                                    }
+                                });
+                                checkedItems.push(R.id.ocjeneRbtn);
+                                break;
+                        }
+                        listView1.setAdapter(adapter);
+                    }
+                })
+                .setNegativeButton("Zatvori", null)
+                .show();
+        for (int id : checkedItems)
+            ((CompoundButton) dialog.findViewById(id)).setChecked(true);
     }
 
     private void parseServerResult(String result) {
@@ -124,7 +200,7 @@ public class ProviderList extends BaseActivity {
                 int fav = R.drawable.blank;
                 int akcija = R.drawable.blank;
                 if (favore.equals("1")) {
-                    fav = R.drawable.fav_icon;
+                    fav = R.drawable.fav_icon_enabled;
                 }
                 if (action.equals("1")) {
                     akcija = R.drawable.akcija_icon;

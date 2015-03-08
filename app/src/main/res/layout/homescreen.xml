@@ -16,8 +16,8 @@
 
         <ImageButton
             android:id="@+id/zdravljebtn"
-            android:layout_width="95dp"
-            android:layout_height="95dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="left|top"
             android:background="@null"
             android:layout_column="0"
@@ -29,8 +29,8 @@
 
         <ImageButton
             android:id="@+id/servisbtn"
-            android:layout_width="95dp"
-            android:layout_height="95dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="left|top"
             android:src="@drawable/servis"
             android:background="@null"
@@ -42,8 +42,8 @@
 
         <ImageButton
             android:id="@+id/ljepotabtn"
-            android:layout_width="95dp"
-            android:layout_height="95dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="left|top"
             android:src="@drawable/ljepota"
             android:background="@null"
@@ -55,8 +55,8 @@
 
         <ImageButton
             android:id="@+id/intelektbtn"
-            android:layout_width="95dp"
-            android:layout_height="95dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="left|top"
             android:src="@drawable/intelekt"
             android:background="@null"
@@ -68,8 +68,8 @@
 
         <ImageButton
             android:id="@+id/dombtn"
-            android:layout_width="95dp"
-            android:layout_height="95dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="left|top"
             android:src="@drawable/dom"
             android:background="@null"
@@ -81,8 +81,8 @@
 
         <ImageButton
             android:id="@+id/sportbtn"
-            android:layout_width="95dp"
-            android:layout_height="95dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="left|top"
             android:src="@drawable/sport"
             android:background="@null"
@@ -94,8 +94,8 @@
 
         <ImageButton
             android:id="@+id/turizambtn"
-            android:layout_width="95dp"
-            android:layout_height="95dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="left|top"
             android:background="@null"
             android:src="@drawable/turizam"
@@ -107,8 +107,8 @@
 
         <ImageButton
             android:id="@+id/prijevozbtn"
-            android:layout_width="95dp"
-            android:layout_height="95dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="left|top"
             android:src="@drawable/prijevoz"
             android:background="@null"
@@ -120,8 +120,8 @@
 
         <ImageButton
             android:id="@+id/kulturabtn"
-            android:layout_width="95dp"
-            android:layout_height="95dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="left|top"
             android:src="@drawable/kultura"
             android:background="@null"

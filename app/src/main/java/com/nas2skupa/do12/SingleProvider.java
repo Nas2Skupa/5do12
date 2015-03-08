@@ -1,27 +1,30 @@
 package com.nas2skupa.do12;
 
-
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.LayerDrawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -30,6 +33,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class SingleProvider extends BaseActivity {
 
@@ -62,11 +66,13 @@ public class SingleProvider extends BaseActivity {
     private String proId;
     ArrayList<PricelistClass> listArray = new ArrayList<PricelistClass>();
     List<Integer> payingArr = new ArrayList<Integer>();
+    List<String> phonesArr = new ArrayList<String>();
     View footer = null;
     private RatingBar ratingBar;
     private RatingBar ratingBarBig;
     private float userRating;
-    ImageView btnFav, btnVise;
+    TextView lblAbout,lblEmail,lblWeb, lblAddress;
+    ImageView btnFav, btnVise, btnMap;
     Dialog favDialog;
     LinearLayout moreLayout;
     Boolean detailOn = false, isFav=false;
@@ -76,9 +82,6 @@ public class SingleProvider extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_single_provider);
-
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        // getting intent data
         Intent in = getIntent();
         Bundle bundle = in.getExtras();
         proClass = bundle.getParcelable("providerclass");
@@ -88,15 +91,24 @@ public class SingleProvider extends BaseActivity {
 
         btnFav = (ImageView) findViewById(R.id.tofav);
         btnVise = (ImageView) findViewById(R.id.details);
+        btnMap = (ImageView) findViewById(R.id.showMap);
+        lblAbout = (TextView) findViewById(R.id.about_label);
+        lblEmail = (TextView) findViewById(R.id.email);
+        lblWeb = (TextView) findViewById(R.id.web);
+        lblAddress = (TextView) findViewById(R.id.address);
+
         btnFav.setOnClickListener(clickHandler);
         btnVise.setOnClickListener(clickHandler);
-        // Displaying all values on the screen
+        btnMap.setOnClickListener(clickHandler);
+        lblAbout.setOnClickListener(clickHandler);
+        lblEmail.setOnClickListener(clickHandler);
+        lblWeb.setOnClickListener(clickHandler);
+        lblAddress.setOnClickListener(clickHandler);
 
         if(proClass.proFav.equals("1")){
             isFav=true;
             btnFav.setImageResource(R.drawable.fav_icon_enabled);
         }
-        // Calling async task to get json
         new GetProvider().execute();
         footer = (View) getLayoutInflater().inflate(R.layout.service_listview_footer_row, null);
         listView1 = (ListView) findViewById(R.id.listView1);
@@ -137,32 +149,77 @@ public class SingleProvider extends BaseActivity {
             }
         });
     }
+    View.OnClickListener phoneClick = new View.OnClickListener(){
+        public void onClick(View v) {
+            try {
+                String uri = ((TextView) v).getText().toString();
+                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + uri));
+                startActivity(intent);
+            }catch (Exception e){
+                Log.d("CALL", e.toString());
+            }
+
+        }
+    };
 
     View.OnClickListener clickHandler = new View.OnClickListener() {
         public void onClick(View v) {
             if (v == btnFav) {
                 new addToFav().execute(null,null,null);
             }
-
-            if (v == btnVise) {
+            if(v==lblEmail){
+                try{
+                    String uri = "mailto:" + lblEmail.getText() + "?subject=" + "Upit sa 5do12";
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                    startActivity(intent);
+                }catch(Exception e){
+                    Log.d("Email:",e.toString());
+            }
+            }
+            if(v==lblWeb){
+                try{
+                    String uri = lblWeb.getText().toString();
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                    startActivity(intent);
+                }catch(Exception e){
+                    Log.d("WWW:",e.toString());
+                }
+            }
+            if(v == lblAddress){
+                try{
+                    String uri = "geo:0,0?q="+lblAddress.getText().toString();
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                    startActivity(intent);
+                }catch(Exception e){
+                    Log.d("MAPA:",e.toString());
+                }
+            }
+            if (v == btnVise || v==lblAbout) {
                 moreLayout = (LinearLayout) findViewById(R.id.moreLayout);
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)btnVise.getLayoutParams();
                 if (detailOn==false) {
+                    lblAbout.setMaxLines(Integer.MAX_VALUE);
                     moreLayout.setVisibility(View.VISIBLE);
                     detailOn=true;
                     btnVise.setImageResource(R.drawable.more_arrow_up);
+                    params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                    btnVise.setLayoutParams(params);
                 }else{
+                    lblAbout.setMaxLines(4);
                     moreLayout.setVisibility(View.GONE);
                     detailOn=false;
                     btnVise.setImageResource(R.drawable.more_arrow_down);
+                    params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM,0);
+                    btnVise.setLayoutParams(params);
                 }
             }
         }
     };
+
     private class addToFav extends AsyncTask<Object, Object, Object> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            // Showing progress dialog
             pDialog = new ProgressDialog(SingleProvider.this);
             pDialog.setMessage("Please wait...");
             pDialog.setCancelable(false);
@@ -212,7 +269,6 @@ public class SingleProvider extends BaseActivity {
         btnFav.setVisibility(View.GONE);
     }
 
-
     private class sendRating extends AsyncTask<Object, Object, Object> {
         @Override
         protected Object doInBackground(Object[] params) {
@@ -246,11 +302,9 @@ public class SingleProvider extends BaseActivity {
     }
 
     private class GetProvider extends AsyncTask<Void, Void, Void> {
-
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            // Showing progress dialog
             pDialog = new ProgressDialog(SingleProvider.this);
             pDialog.setMessage("Please wait...");
             pDialog.setCancelable(false);
@@ -261,10 +315,8 @@ public class SingleProvider extends BaseActivity {
         @SuppressLint("DefaultLocale")
         @Override
         protected Void doInBackground(Void... arg0) {
-            // Creating service handler class instance
             ServiceHandler sh = new ServiceHandler();
 
-            // Making a request to url and getting response
             String jsonStr = sh.makeServiceCall(url, ServiceHandler.GET);
 
             Log.d("Response: ", "> " + jsonStr);
@@ -273,7 +325,6 @@ public class SingleProvider extends BaseActivity {
                 try {
                     JSONObject jsonObj = new JSONObject(jsonStr);
 
-                    // Getting JSON Array node
                     providers = jsonObj.getJSONArray(TAG_ARRAY);
                     for (int i = 0; i < providers.length(); i++) {
                         provider = providers.getJSONObject(i);
@@ -283,20 +334,26 @@ public class SingleProvider extends BaseActivity {
                             String serviceID = p.getString("serviceID");
                             String service = p.getString("service");
                             String action = p.getString("action");
+                            String termin = p.getString("termin");
                             int akcija = 0;
                             String price = p.getString("reg_price") + " " + getString(R.string.currency);
                             if (action.equals("1")) {
                                 price = p.getString("action_price") + " " + getString(R.string.currency);
-                                akcija = R.drawable.akcija_icon_small;
+                                akcija = R.drawable.akcija_icon;
                             }
                             Log.d("ServiceID in populate:"+service,serviceID);
-                            PricelistClass currPrice = new PricelistClass(serviceID, service, price, akcija);
+                            PricelistClass currPrice = new PricelistClass(serviceID, service, price,termin, akcija);
                             listArray.add(currPrice);
                         }
                         payopt = provider.getJSONArray("payopt");
                         for (int j = 0; j < payopt.length(); j++) {
                             JSONObject p = payopt.getJSONObject(j);
                             payingArr.add(Integer.parseInt(p.getString("paying")));
+                        }
+                        phones = provider.getJSONArray("phones");
+                        for (int j = 0; j < phones.length(); j++) {
+                            JSONObject p = phones.getJSONObject(j);
+                            phonesArr.add(p.getString("phone"));
                         }
                     }
                 } catch (JSONException e) {
@@ -313,20 +370,65 @@ public class SingleProvider extends BaseActivity {
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-            // Dismiss the progress dialog
             if (pDialog.isShowing())
                 pDialog.dismiss();
-            /**
-             * Updating parsed JSON data into ListView
-             * */
-
-            //Toast.makeText(SingleProvider.this, pricelists.length(), Toast.LENGTH_SHORT).show();
             TextView lblName = (TextView) findViewById(R.id.name_label);
             TextView lblAbout = (TextView) findViewById(R.id.about_label);
+            TextView lblWorking = (TextView) findViewById(R.id.working);
+            LinearLayout llMore = (LinearLayout) findViewById(R.id.moreLayout);
             lblAbout.setBackgroundColor(Color.parseColor(color));
+            llMore.setBackgroundColor(Color.parseColor(color));
             try {
                 lblName.setText(provider.getString(TAG_NAME));
                 lblAbout.setText(provider.getString(TAG_ABOUT));
+                LinearLayout phones= (LinearLayout) findViewById(R.id.phonesLL);
+                final float scale = getResources().getDisplayMetrics().density;
+                int padding = (int) (5 * scale + 0.5f);
+                for(int i = 0; i < phonesArr.size(); i++){
+                    TextView phoneView = new TextView(SingleProvider.this);
+                    phoneView.setText(phonesArr.get(i));
+                    phoneView.setTextColor(Color.parseColor("#FFFFFF"));
+                    phoneView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+                    phoneView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.call, 0, 0, 0);
+                    phoneView.setCompoundDrawablePadding(padding);
+                    phoneView.setPadding(padding, 0, 0, padding);
+                    phoneView.setGravity(Gravity.CENTER_VERTICAL);
+                    phoneView.setTag("phone" + i);
+                    phoneView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                    phoneView.setOnClickListener(phoneClick);
+                    phones.addView(phoneView);
+                }
+                lblAddress.setText(provider.getString("address")+", "+provider.getString("cityName"));
+                lblAddress.setCompoundDrawablesWithIntrinsicBounds(R.drawable.google_maps_logo_transparent, 0, 0, 0);
+                lblAddress.setCompoundDrawablePadding(padding);
+                lblWeb.setText(Html.fromHtml("<u>" + provider.getString("web") + "</u>"));
+                lblWeb.setCompoundDrawablesWithIntrinsicBounds(R.drawable.web, 0, 0, 0);
+                lblWeb.setCompoundDrawablePadding(padding);
+                lblEmail.setText(Html.fromHtml("<u>" + provider.getString("email") + "</u>"));
+                lblEmail.setCompoundDrawablesWithIntrinsicBounds(R.drawable.email, 0, 0, 0);
+                lblEmail.setCompoundDrawablePadding(padding);
+                lblWorking.setText(provider.getString("workingH"));
+                int[] payArray = new int[payingArr.size()];
+                for(int i = 0; i < payingArr.size(); i++) payArray[i] = payingArr.get(i);
+                for(int i=0;i<payArray.length;i++){
+                    ImageView payO;
+                    if(payArray[i]==2){
+                        payO = (ImageView) findViewById(R.id.visa);
+                        payO.setVisibility(View.VISIBLE);
+                    }
+                    if(payArray[i]==3){
+                        payO = (ImageView) findViewById(R.id.american);
+                        payO.setVisibility(View.VISIBLE);
+                    }
+                    if(payArray[i]==4){
+                        payO = (ImageView) findViewById(R.id.master);
+                        payO.setVisibility(View.VISIBLE);
+                    }
+                    if(payArray[i]==5){
+                        payO = (ImageView) findViewById(R.id.diners);
+                        payO.setVisibility(View.VISIBLE);
+                    }
+                }
                 try {
                     float rating = Float.parseFloat(provider.getString(TAG_RATING));
                     ratingBar.setRating(rating);
@@ -335,7 +437,6 @@ public class SingleProvider extends BaseActivity {
             }catch (JSONException e){
                 Log.e("JSON EXC", e.toString());
             }
-
 
             adapter = new PricelistAdapter(SingleProvider.this,
                     R.layout.listview_service_row, listArray);

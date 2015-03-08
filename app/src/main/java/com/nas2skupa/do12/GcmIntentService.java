@@ -7,6 +7,8 @@ import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -85,6 +87,7 @@ public class GcmIntentService extends IntentService {
         }
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.icon_5do12)
@@ -92,7 +95,8 @@ public class GcmIntentService extends IntentService {
                         .setStyle(new NotificationCompat.BigTextStyle()
                                 .bigText(msg))
                         .setContentText(msg)
-                        .setAutoCancel(true);
+                        .setAutoCancel(true)
+                        .setSound(alarmSound);
 
         mBuilder.setContentIntent(contentIntent);
         mNotificationManager.notify(notificationId++, mBuilder.build());

@@ -4,10 +4,10 @@
     android:layout_height="wrap_content">
 	<item
 		android:state_pressed="true"
-		android:drawable="@drawable/calendar_bg_orange" /> <!-- pressed -->
+		android:drawable="@drawable/calendar_tile_small" /> <!-- pressed -->
 	<item
 		android:state_focused="true"
-		android:drawable="@drawable/calendar_bg_orange" /> <!-- focused -->
+		android:drawable="@drawable/calendar_tile_small" /> <!-- focused -->
 	<item
 		android:drawable="@drawable/calendar_tile_new_small" /> <!-- default -->
 </selector>

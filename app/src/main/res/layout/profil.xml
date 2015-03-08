@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/back">
+    <TextView
+        android:id="@+id/subcatname"
+        android:layout_width="260dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:paddingBottom="15dp"
+        android:paddingTop="15dp"
+        android:paddingRight="15dp"
+        android:background="#FF0000"
+        android:text="TextView" />
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp">
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp">
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/pUsernamelbl"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#666666"
+                android:paddingTop="20dp"
+                android:text="Korisničko ime: "/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#666666"
+                android:textSize="15sp"
+                android:id="@+id/pUsername" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/pNamelbl"
+                android:textSize="15sp"
+                android:textColor="#666666"
+                android:textStyle="bold"
+                android:paddingTop="20dp"
+                android:text="Ime i prezime: "/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#666666"
+                android:textSize="15sp"
+                android:id="@+id/pName" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/addressLL"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/pAdresalbl"
+                android:textSize="15sp"
+                android:textColor="@color/greenApp"
+                android:textStyle="bold"
+                android:paddingTop="20dp"
+                android:text="Adresa: "/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/greenApp"
+                android:textSize="15sp"
+                android:id="@+id/pAdresa" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/pEmaillbl"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#666666"
+                android:paddingTop="20dp"
+                android:text="Email: "/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#666666"
+                android:textSize="15sp"
+                android:id="@+id/pEmail" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/mobLL"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/pMobilelbl"
+                android:textSize="15sp"
+                android:textColor="@color/greenApp"
+                android:textStyle="bold"
+                android:paddingTop="20dp"
+                android:text="Mobitel: "/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/greenApp"
+                android:textSize="15sp"
+                android:id="@+id/pMobile" />
+        </LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/pPasswordlbl"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:paddingTop="20dp"
+            android:textColor="@color/greenApp"
+            android:text="Promijeni lozinku!"/>
+    </LinearLayout>
+    </ScrollView>
+</LinearLayout>

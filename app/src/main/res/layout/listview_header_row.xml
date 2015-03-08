@@ -3,19 +3,35 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_height="fill_parent"
+    android:clickable="true">
        
      
    <TextView
         android:id="@+id/subcatname"
         android:layout_width="260dp"
-        android:layout_height="50dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignRight="@+id/imageView1"
+        android:layout_height="wrap_content"
         android:layout_marginTop="18dp"
         android:paddingRight="15dp"
+       android:paddingBottom="15dp"
+       android:paddingTop="15dp"
         android:background="#FF0000"
         android:text="TextView" />
+
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:layout_marginTop="18dp" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:src="@drawable/sort"
+        android:layout_marginTop="18dp"
+        android:paddingRight="15dp"
+        android:id="@+id/listSettingsBtn"
+        android:layout_marginRight="5dp"
+        android:visibility="invisible" />
 
 </LinearLayout>

@@ -5,6 +5,8 @@ import com.navdrawer.SimpleSideDrawer;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,6 +24,7 @@ public class BaseActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         
         slide_me = new SimpleSideDrawer(this);
         slide_me.setRightBehindContentView(R.layout.sidemenu);
@@ -30,6 +33,7 @@ public class BaseActivity extends Activity {
         TextView favTV = (TextView) findViewById(R.id.favoritibtn);
         TextView akcTV = (TextView) findViewById(R.id.akcijebtn);
         TextView odjTV = (TextView) findViewById(R.id.odjavabtn);
+        TextView proTV = (TextView) findViewById(R.id.profilbtn);
         inputSearch = (EditText) findViewById(R.id.inputSearch);
         inputSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -41,16 +45,17 @@ public class BaseActivity extends Activity {
             }
         });
         pocTV.setOnClickListener(new OnClickListener() {
-
             @Override
             public void onClick(View v) {
-    			homeActivity();
+                Log.d("KLIK!!!!!!!","home");
+                homeActivity();
             }
         });
         orgTV.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
+                Log.d("KLIK!!!!!!!","organizer");
                 listActivity();
             }
         });
@@ -58,6 +63,7 @@ public class BaseActivity extends Activity {
 
             @Override
             public void onClick(View v) {
+                Log.d("KLIK!!!!!!!","favorites");
                 favActivity();
             }
         });
@@ -65,13 +71,23 @@ public class BaseActivity extends Activity {
 
             @Override
             public void onClick(View v) {
+                Log.d("KLIK!!!!!!!","actions");
                 vaznoActivity();
+            }
+        });
+        proTV.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Log.d("KLIK!!!!!!!","profil");
+                profilActivity();
             }
         });
         odjTV.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
+                Log.d("KLIK!!!!!!!","logout");
                 logoutActivity();
             }
         });
@@ -130,10 +146,14 @@ public class BaseActivity extends Activity {
         startActivity(i);
 	}
 
-	public void vaznoActivity() {
+    public void vaznoActivity() {
         Intent i = new Intent(this, Akcije.class);
         startActivity(i);
-	}
+    }
+    public void profilActivity() {
+        Intent i = new Intent(this, ProfilActivity.class);
+        startActivity(i);
+    }
 	
 	public void logoutActivity() {
         Intent i = new Intent(this, LoginScreen.class);
@@ -152,7 +172,7 @@ public class BaseActivity extends Activity {
         switch (CatId) {
 
             case 1:
-                catSettings[0]="zdrastvene usluge";
+                catSettings[0]="zdravstvene usluge";
                 catSettings[1]="#7ec5c4";
                 return catSettings;
             case 2:
@@ -161,11 +181,11 @@ public class BaseActivity extends Activity {
                 return catSettings;
             case 3:
                 catSettings[0]="ljepota";
-                catSettings[1]="#ed145b";
+                catSettings[1]="#a80364";
                 return catSettings;
             case 4:
                 catSettings[0]="intelektualne usluge";
-                catSettings[1]="#fad12f";
+                catSettings[1]="#49019a";
                 return catSettings;
             case 5:
                 catSettings[0]="dom i obitelj";

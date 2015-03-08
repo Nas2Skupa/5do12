@@ -5,15 +5,19 @@
     android:background="#adbb00"
     android:orientation="vertical" >
 
-    <EditText android:id="@+id/inputSearch"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:drawableLeft="@drawable/trazilicabtn"
-    android:drawablePadding="10dp"
-    android:singleLine="true"
-    android:imeOptions="actionSearch"
-    android:hint="Pretraži 5do12"
-    android:inputType="text"/>
+    <EditText
+        android:id="@+id/inputSearch"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/trazilicabtn"
+        android:drawablePadding="10dp"
+        android:layout_marginLeft="10dp"
+        android:singleLine="true"
+        android:textColorHint="#FFFFFF"
+        android:textColor="#FFFFFF"
+        android:imeOptions="actionSearch"
+        android:hint="Pretraži 5do12"
+        android:inputType="text"/>
 
     <ImageView
         android:id="@+id/imageView1"
@@ -108,7 +112,7 @@
         android:layout_height="wrap_content"
         android:src="@drawable/breakline" />
 
-    
+    <!--
     <TextView
         android:id="@+id/prijateljibtn"
         android:layout_width="wrap_content"
@@ -143,6 +147,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/breakline" />
+    -->
 
     <TextView
         android:id="@+id/odjavabtn"

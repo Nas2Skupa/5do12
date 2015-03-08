@@ -9,11 +9,13 @@ import android.os.AsyncTask;
  * Created by Ranko on 22.11.2014..
  */
 public class HttpRequest {
+    private boolean silent;
     private Context context;
     private ProgressDialog progressDialog;
 
-    public HttpRequest(Context context, Uri uri) {
+    public HttpRequest(Context context, Uri uri, boolean silent) {
         this.context = context;
+        this.silent = silent;
         new HttpWorker().execute(uri);
     }
 
@@ -21,6 +23,7 @@ public class HttpRequest {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            if(silent) return;
             progressDialog = new ProgressDialog(context);
             progressDialog.setMessage("Molimo pričekajte...");
             progressDialog.setCancelable(false);
@@ -36,7 +39,7 @@ public class HttpRequest {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            if (progressDialog.isShowing())
+            if (!silent && progressDialog.isShowing())
                 progressDialog.dismiss();
             onHttpResultListener.onHttpResult(result);
         }

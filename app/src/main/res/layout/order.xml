@@ -4,6 +4,9 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="@drawable/back">
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -19,11 +22,14 @@
         android:textStyle="bold"
         android:paddingTop="20dp" />
 
+
         <RatingBar
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/ratingBar2"
-        style="?android:attr/ratingBarStyleSmall" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ratingBarOrder"
+            android:layout_gravity="left"
+            style="?android:attr/ratingBarStyleSmall"
+            android:numStars="5" />
 
         <LinearLayout
             android:id="@+id/payingoptions"
@@ -70,34 +76,33 @@
                 android:paddingTop="20dp"
                 android:text="Naručujem uslugu:"/>
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginTop="10dp">
                 <TextView
                     android:id="@+id/usluga"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="6"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:textColor="#666666"
                     android:textSize="15sp" />
-                <ImageView
-                    android:id="@+id/akcijaServiceIcon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="5dp"
-                    android:layout_toLeftOf="@id/txtPrice"
-                    android:layout_alignTop="@+id/txtPrice"
-                    android:src="@drawable/akcija_icon_small" />
                 <TextView
-                    android:id="@+id/txtPrice"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/txtTermin"
+                    android:layout_width="0dp"
+                    android:layout_weight="2"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
                     android:textColor="#666666"
                     android:textSize="15sp" />
-            </RelativeLayout>
+                <TextView
+                    android:id="@+id/txtPrice"
+                    android:layout_width="0dp"
+                    android:layout_weight="2"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp" />
+            </LinearLayout>
 
         <View
             android:layout_width="match_parent"
@@ -168,4 +173,5 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="10dp" />
     </LinearLayout>
+    </ScrollView>
 </LinearLayout>

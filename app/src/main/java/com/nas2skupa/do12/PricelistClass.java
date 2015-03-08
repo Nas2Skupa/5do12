@@ -7,7 +7,7 @@ import android.os.Parcelable;
  * Created by tomislav on 20.11.2014..
  */
 public class PricelistClass implements Parcelable {
-    String plID ,plName, plPrice;
+    String plID ,plName, plPrice,plTermin;
     int akcijaIcon;
 
     @Override
@@ -20,13 +20,15 @@ public class PricelistClass implements Parcelable {
         dest.writeString(plID);
         dest.writeString(plName);
         dest.writeString(plPrice);
+        dest.writeString(plTermin);
         dest.writeInt(akcijaIcon);
     }
 
-    public PricelistClass(String splID, String splName, String splPrice, int iakcijaIcon){
+    public PricelistClass(String splID, String splName, String splPrice, String splTermin, int iakcijaIcon){
         this.plID = splID;
         this.plName = splName;
         this.plPrice = splPrice;
+        this.plTermin = splTermin;
         this.akcijaIcon = iakcijaIcon;
 
     }
@@ -34,6 +36,7 @@ public class PricelistClass implements Parcelable {
         this.plID = in.readString();
         this.plName = in.readString();
         this.plPrice = in.readString();
+        this.plTermin = in.readString();
         this.akcijaIcon = in.readInt();
     }
     public static final Creator<PricelistClass> CREATOR = new Creator<PricelistClass>() {

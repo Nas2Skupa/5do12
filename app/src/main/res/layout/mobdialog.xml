@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical">
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textColor="#666666"
+            android:textSize="15sp"
+            android:text="Broj mobitela"/>
+        <EditText
+            android:id="@+id/mobtxt"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#666666"
+            android:textColorHint="#666666"
+            android:textSize="15sp"
+            android:layout_marginBottom="10dp"
+            android:hint="Unesite broj mobitel"/>
+
+        <TextView
+            android:id="@+id/errorTxt"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textStyle="bold"
+            android:textColor="#FF0000"
+            android:textSize="15sp"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="20dp"
+        android:gravity="center_horizontal">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:background="@color/greenApp"
+            android:textColor="@color/white"
+            android:layout_marginRight="5dp"
+            android:text="Odustani"
+            android:id="@+id/cancel" />
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:background="@color/greenApp"
+            android:textColor="@color/white"
+            android:layout_marginLeft="5dp"
+            android:text="Spremi"
+            android:id="@+id/save" />
+
+        </LinearLayout>
+
+</LinearLayout>

@@ -1,8 +1,5 @@
 package com.nas2skupa.do12;
  
-import com.navdrawer.SimpleSideDrawer;
-
-
 import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,7 +7,7 @@ import android.view.View;
 
 public class HomeScreen extends BaseActivity {   
 	
-	SimpleSideDrawer slide_me;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

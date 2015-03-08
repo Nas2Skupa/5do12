@@ -7,7 +7,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.text.method.ScrollingMovementMethod;
@@ -118,33 +119,29 @@ public class Organizer extends BaseActivity implements OnClickListener {
                 .setMessage(message)
                 .setPositiveButton("Potvrdi", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        new SendConfirmation().execute(orderId, "1");
+                        sendConfirmation(orderId, "1");
                     }
                 })
                 .setNegativeButton("Otkaži", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        new SendConfirmation().execute(orderId, "2");
+                        sendConfirmation(orderId, "2");
                     }
                 })
                 .show();
     }
 
-    private class SendConfirmation extends AsyncTask<String, Void, Void> {
-
-        @Override
-        protected Void doInBackground(String... params) {
-            String orderId = params[0];
-            String confirmed = params[1];
-            try {
-                ServiceHandler sh = new ServiceHandler();
-                String url = "http://nas2skupa.com/5do12/confirmUser.aspx?orderId=" + orderId + "&confirmed=" + confirmed;
-                String msg = sh.makeServiceCall(url, ServiceHandler.GET);
-                Log.d("Response: ", "> " + msg);
-            } catch (Exception ex) {
-                Log.d("Error :", ex.getMessage());
-            }
-            return null;
-        }
+    private void sendConfirmation(String orderId, String confirmed) {
+        Uri uri = new Uri.Builder().encodedPath("http://nas2skupa.com/5do12/confirmUser.aspx")
+                .appendQueryParameter("orderId", orderId)
+                .appendQueryParameter("confirmed", confirmed)
+                .build();
+        new HttpRequest(getApplicationContext(), uri, true)
+                .setOnHttpResultListener(new HttpRequest.OnHttpResultListener() {
+                    @Override
+                    public void onHttpResult(String result) {
+                        adapter.refreshCalendar();
+                    }
+                });
     }
 
     /**
@@ -216,7 +213,7 @@ public class Organizer extends BaseActivity implements OnClickListener {
 
         private ProgressDialog pDialog;
         private String url;
-        private HashMap<String, ArrayList<Order>> orders = new HashMap<String, ArrayList<Order>>();
+        public HashMap<String, ArrayList<Order>> orders = new HashMap<String, ArrayList<Order>>();
 
         // Days in Current Month
         public GridCellAdapter(Context context, int textViewResourceId, int month, int year) {
@@ -239,10 +236,45 @@ public class Organizer extends BaseActivity implements OnClickListener {
             currentMonth.setText(getMonthAsString(month - 1) + ", " + year + ".");
             printMonth(month, year);
 
+            refreshCalendar();
+        }
+
+        public void refreshCalendar() {
+            orders.clear();
             final SharedPreferences prefs = getSharedPreferences("user", Context.MODE_PRIVATE);
             String userId = prefs.getString("id", "");
-            url = "http://nas2skupa.com/5do12/getOrders.aspx?userId=" + userId + "&year=" + year + "&month=" + month;
-            new GetOrders().execute();
+            Uri uri = new Uri.Builder().encodedPath("http://nas2skupa.com/5do12/getOrders.aspx")
+                    .appendQueryParameter("userId", userId)
+                    .appendQueryParameter("year", String.valueOf(year))
+                    .appendQueryParameter("month", String.valueOf(month))
+                    .build();
+            new HttpRequest(getApplicationContext(), uri, true)
+                    .setOnHttpResultListener(new HttpRequest.OnHttpResultListener() {
+                        @Override
+                        public void onHttpResult(String result) {
+                            parseServerResult(result);
+                        }
+                    });
+        }
+
+        private void parseServerResult(String result) {
+            try {
+                JSONObject jsonObj = new JSONObject(result);
+                JSONArray jsonArray = jsonObj.getJSONArray("orders");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    Order order = new Order(jsonArray.getJSONObject(i));
+                    String key = new DateFormat().format("d-M-yyyy", order.date).toString();
+                    if (orders.containsKey(key))
+                        orders.get(key).add(order);
+                    else
+                        orders.put(key, new ArrayList<Order>(Arrays.asList(order)));
+                }
+            } catch (JSONException e) {
+                Log.e("ActionHttpRequest", "Error parsing server data.");
+                e.printStackTrace();
+            }
+            this.notifyDataSetChanged();
+            calendarView.setAdapter(this);
         }
 
         private String getMonthAsString(int i) {
@@ -334,7 +366,7 @@ public class Organizer extends BaseActivity implements OnClickListener {
             // Trailing Month days
             for (int i = 0; i < trailingSpaces; i++) {
                 Log.d(tag, "PREV MONTH:= " + prevMonth + " => " + getMonthAsString(prevMonth) + " " + String.valueOf((daysInPrevMonth - trailingSpaces + DAY_OFFSET) + i));
-                list.add(String.valueOf((daysInPrevMonth - trailingSpaces + DAY_OFFSET) + i) + "-GREY" + "-" + (prevMonth + 1) + "-" + prevYear);
+                list.add(String.valueOf((daysInPrevMonth - trailingSpaces + DAY_OFFSET) + i) + "-PASSIVE" + "-" + (prevMonth + 1) + "-" + prevYear);
             }
 
             // Current Month Days
@@ -344,16 +376,16 @@ public class Organizer extends BaseActivity implements OnClickListener {
                 if (cal.get(Calendar.YEAR) == currentDate.get(Calendar.YEAR)
                         && cal.get(Calendar.MONTH) == currentDate.get(Calendar.MONTH)
                         && cal.get(Calendar.DAY_OF_MONTH) == currentDate.get(Calendar.DAY_OF_MONTH)) {
-                    list.add(String.valueOf(i) + "-BLUE" + "-" + (currentMonth + 1) + "-" + yy);
+                    list.add(String.valueOf(i) + "-CURRENT" + "-" + (currentMonth + 1) + "-" + yy);
                 } else {
-                    list.add(String.valueOf(i) + "-WHITE" + "-" + (currentMonth + 1) + "-" + yy);
+                    list.add(String.valueOf(i) + "-ACTIVE" + "-" + (currentMonth + 1) + "-" + yy);
                 }
             }
 
             // Leading Month days
             for (int i = 0; i < list.size() % 7; i++) {
                 Log.d(tag, "NEXT MONTH:= " + getMonthAsString(nextMonth));
-                list.add(String.valueOf(i + 1) + "-GREY" + "-" + (nextMonth + 1) + "-" + nextYear);
+                list.add(String.valueOf(i + 1) + "-PASSIVE" + "-" + (nextMonth + 1) + "-" + nextYear);
             }
         }
 
@@ -385,9 +417,17 @@ public class Organizer extends BaseActivity implements OnClickListener {
             final String key = theday + "-" + themonth + "-" + theyear;
             if (orders.size() > 0) {
                 if (orders.containsKey(key)) {
-                    num_events_per_day = (TextView) row.findViewById(R.id.num_events_per_day);
-                    Integer numEvents = orders.get(key).size();
-                    num_events_per_day.setText(numEvents.toString());
+                    try {
+                        Calendar orderDate = Calendar.getInstance();
+                        orderDate.setTime(new SimpleDateFormat("dd-MM-yyyy").parse(key));
+                        num_events_per_day = (TextView) row.findViewById(R.id.num_events_per_day);
+                        Integer numEvents = orders.get(key).size();
+                        num_events_per_day.setText(numEvents.toString());
+                        if (orderDate.before(currentDate))
+                            num_events_per_day.setTextColor(Color.parseColor("#B0C8CF"));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
 
@@ -396,14 +436,14 @@ public class Organizer extends BaseActivity implements OnClickListener {
             gridcell.setTag(theday + "-" + themonth + "-" + theyear);
             Log.d(tag, "Setting GridCell " + theday + "-" + themonth + "-" + theyear);
 
-            if (color.equals("GREY")) {
+            if (color.equals("PASSIVE")) {
                 gridcell.setTextAppearance(_context, R.style.passive_month_day);
                 gridcell.setClickable(false);
             }
-            if (color.equals("WHITE")) {
+            if (color.equals("ACTIVE")) {
                 gridcell.setTextAppearance(_context, R.style.active_month_day);
             }
-            if (color.equals("BLUE")) {
+            if (color.equals("CURRENT")) {
                 gridcell.setTextAppearance(_context, R.style.current_day);
             }
             return row;
@@ -413,7 +453,6 @@ public class Organizer extends BaseActivity implements OnClickListener {
         public void onClick(View view) {
             String date_month_year = (String) view.getTag();
             String dateString = date_month_year.replace('-', '.').concat(".");
-            String eventsStr = "";
             if (orders.containsKey(date_month_year)) {
                 ArrayList<Order> events = orders.get(date_month_year);
                 showEventsDialog(dateString, events);
@@ -427,38 +466,50 @@ public class Organizer extends BaseActivity implements OnClickListener {
             }
         }
 
-        String eventToArray(Order o) {
-            return o.proName;
-        }
-
         public void showEventsDialog(String date, final ArrayList<Order> events) {
             final int count = events.size();
             final boolean[] selectedItems = new boolean[count];
             final String[] eventsDescriptions = new String[count];
+            Calendar orderDate = Calendar.getInstance();
+            try {
+                orderDate.setTime(new SimpleDateFormat("dd.MM.yyyy.").parse(date));
+            } catch (ParseException e) {
+                e.printStackTrace();
+                return;
+            }
             SimpleDateFormat tf = new SimpleDateFormat("HH:mm");
             for (int i = 0; i < count; i++) {
                 Order order = events.get(i);
-                eventsDescriptions[i] = String.format("%s\n%s - %s", order.proName, tf.format(order.startTime), tf.format(order.endTime));
+                eventsDescriptions[i] = String.format("%s\n%s - %s\n%s (%s kn)",
+                        order.proName,
+                        tf.format(order.startTime),
+                        tf.format(order.endTime),
+                        order.serviceName,
+                        order.servicePrice);
             }
-            new AlertDialog.Builder(Organizer.this)
-                    .setTitle(date)
-                    .setMultiChoiceItems(eventsDescriptions, null,
-                            new DialogInterface.OnMultiChoiceClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                                    selectedItems[which] = isChecked;
-                                }
-                            })
-                    .setPositiveButton("Otkaži označene", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            for (int i = 0; i < count; i++) {
-                                if (selectedItems[i])
-                                    new Organizer.SendConfirmation().execute(events.get(i).id, "3");
+            AlertDialog.Builder builder = new AlertDialog.Builder(Organizer.this);
+            builder.setTitle(date);
+            if (orderDate.before(currentDate))
+                builder.setItems(eventsDescriptions, null);
+            else {
+                builder.setMultiChoiceItems(eventsDescriptions, null,
+                        new DialogInterface.OnMultiChoiceClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                                selectedItems[which] = isChecked;
                             }
+                        });
+                builder.setPositiveButton("Otkaži označene", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        for (int i = 0; i < count; i++) {
+                            if (selectedItems[i])
+                                sendConfirmation(events.get(i).id, "3");
                         }
-                    })
-                    .setNegativeButton("Zatvori", null)
-                    .show();
+                    }
+                });
+            }
+            builder.setNegativeButton("Zatvori", null);
+            builder.show();
         }
 
         public int getCurrentDayOfMonth() {
@@ -476,99 +527,6 @@ public class Organizer extends BaseActivity implements OnClickListener {
         public int getCurrentWeekDay() {
             return currentWeekDay;
         }
-
-        private class GetOrders extends AsyncTask<Void, Void, Void> {
-
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                // Showing progress dialog
-                pDialog = new ProgressDialog(Organizer.this);
-                pDialog.setMessage("Please wait...");
-                pDialog.setCancelable(false);
-                pDialog.show();
-
-            }
-
-            @Override
-            protected Void doInBackground(Void... arg0) {
-                // Creating service handler class instance
-                ServiceHandler sh = new ServiceHandler();
-
-                // Making a request to url and getting response
-                String jsonStr = sh.makeServiceCall(url, ServiceHandler.GET);
-
-                Log.d("Response: ", "> " + jsonStr);
-
-                if (jsonStr != null) try {
-                    JSONObject jsonObj = new JSONObject(jsonStr);
-                    JSONArray jsonArray = jsonObj.getJSONArray("orders");
-//
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        Order order = new Order(jsonArray.getJSONObject(i));
-                        String key = new DateFormat().format("d-M-yyyy", order.date).toString();
-                        if (orders.containsKey(key))
-                            orders.get(key).add(order);
-                        else
-                            orders.put(key, new ArrayList<Order>(Arrays.asList(order)));
-                    }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                else {
-                    Log.e("ServiceHandler", "Couldn't get any data from the url");
-                }
-
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void result) {
-                super.onPostExecute(result);
-                // Dismiss the progress dialog
-                if (pDialog.isShowing()) {
-                    pDialog.dismiss();
-                }
-                updateCalendar(month, year);
-            }
-        }
     }
-
-/*
-    public class ShowEventsDialogFragment extends DialogFragment {
-        private ArrayList mSelectedItems;
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            mSelectedItems = new ArrayList();  // Where we track the selected items
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setMessage(R.string.dialog_fire_missiles)
-                    .setTitle(date)
-                    .setMultiChoiceItems(events, null,
-                            new DialogInterface.OnMultiChoiceClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which,
-                                                    boolean isChecked) {
-                                    if (isChecked) {
-                                        // If the user checked the item, add it to the selected items
-                                        mSelectedItems.add(which);
-                                    } else if (mSelectedItems.contains(which)) {
-                                        // Else, if the item is already in the array, remove it
-                                        mSelectedItems.remove(Integer.valueOf(which));
-                                    }
-                                }
-                            })
-                    .setPositiveButton("Otkaži označene", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-//                            new Organizer.SendConfirmation().execute(orderId, "3");
-                        }
-                    })
-                    .setNegativeButton("Zatvori", null);
-            // Create the AlertDialog object and return it
-            return builder.create();
-        }
-    }
-*/
 }
 

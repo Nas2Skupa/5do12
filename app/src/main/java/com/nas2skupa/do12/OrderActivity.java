@@ -1,9 +1,13 @@
 package com.nas2skupa.do12;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
@@ -11,9 +15,14 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.LayerDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -47,16 +56,18 @@ public class OrderActivity extends BaseActivity{
     ImageView btnNaruci;
 
     EditText  txtNote;
-    TextView txtDate, txtTime, txtService,name_label, txtPrice;
+    TextView txtDate, txtTime, txtService,name_label, txtPrice, txtTermin;
 
     // Variable for storing current date and time
     private int mYear, mMonth, mDay, mHour, mMinute;
-    private String serviceID,providerID,userId, provider, service, color, responseBody;
+    private String serviceID,providerID,userId, provider, service, termin, color, responseBody;
     private ProgressDialog pDialog;
     Boolean orderok=false;
     ProviderClass proClass;
     PricelistClass priceClass;
+    TimePickerDialog tpd;
     int[] payOpts;
+    SimpleDateFormat outputDateFormatter = new SimpleDateFormat("dd-MM-yyyy");
 
     /** Called when the activity is first created. */
     @Override
@@ -69,7 +80,9 @@ public class OrderActivity extends BaseActivity{
         priceClass = bundle.getParcelable("pricelistclass");
         color = bundle.getString("color");
         payOpts=bundle.getIntArray("paying");
-        RatingBar ratingBar = (RatingBar) findViewById(R.id.ratingBar2);
+        RatingBar ratingBar = (RatingBar) findViewById(R.id.ratingBarOrder);
+        LayerDrawable stars = (LayerDrawable) ratingBar.getProgressDrawable();
+        stars.getDrawable(2).setColorFilter(Color.parseColor("#ffadbb02"), PorterDuff.Mode.SRC_IN);
         try {
             float rating = proClass.rating;
             ratingBar.setRating(rating);
@@ -80,6 +93,7 @@ public class OrderActivity extends BaseActivity{
         providerID = proClass.proID;
         provider = proClass.proName;
         service = priceClass.plName;
+        termin = priceClass.plTermin;
         final SharedPreferences prefs = getSharedPreferences("user", Context.MODE_PRIVATE);
         userId = prefs.getString("id", "");
 
@@ -87,11 +101,12 @@ public class OrderActivity extends BaseActivity{
             txtService = (TextView) findViewById(R.id.usluga);
             txtService.setText(service);
             name_label=(TextView) findViewById(R.id.name_label);
+            name_label.setOnClickListener(null);
             name_label.setText(provider);
+            txtTermin = (TextView) findViewById(R.id.txtTermin);
+            txtTermin.setText(termin+"'");
 
-            Log.d("SERVICE////////////////", service);
         }catch (Exception e){
-            Log.e("ERROR//////////////////", e.toString());
         }
         txtDate = (TextView) findViewById(R.id.txtDate);
         txtTime = (TextView) findViewById(R.id.txtTime);
@@ -118,8 +133,11 @@ public class OrderActivity extends BaseActivity{
         }
         Time today = new Time(Time.getCurrentTimezone());
         today.setToNow();
-        txtDate.setText(today.monthDay + "-" + (today.month + 1) + "-" + today.year);
-        txtTime.setText(today.format("%H:%M"));
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+        Date nowDate=Calendar.getInstance().getTime();
+        Log.d("DATUM:", DateFormat.format("dd-MM-yyyy", nowDate).toString());
+        txtDate.setText(DateFormat.format("dd-MM-yyyy", nowDate).toString());
+        txtTime.setText(String.format("%02d", today.hour)+":"+String.format("%02d", today.minute));
         txtDate.setOnClickListener(clickHandler);
         txtTime.setOnClickListener(clickHandler);
         btnNaruci.setOnClickListener(clickHandler);
@@ -132,24 +150,30 @@ public class OrderActivity extends BaseActivity{
             if (v == txtDate) {
 
                 // Process to get Current Date
-                final Calendar c = Calendar.getInstance();
+                final Calendar c = Calendar.getInstance(new Locale("hr", "HR"));
                 mYear = c.get(Calendar.YEAR);
                 mMonth = c.get(Calendar.MONTH);
                 mDay = c.get(Calendar.DAY_OF_MONTH);
+                DatePickerDialog.OnDateSetListener dsl=new DatePickerDialog.OnDateSetListener() {
 
+                    @Override
+                    public void onDateSet(DatePicker view, int year,
+                                          int monthOfYear, int dayOfMonth) {
+                        // Display Selected date in textbox
+                        Calendar calendar = new GregorianCalendar();
+                        calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                        calendar.set(Calendar.MONTH, monthOfYear);
+                        calendar.set(Calendar.YEAR, year);
+                        Date selDate=calendar.getTime();
+                        txtDate.setText(DateFormat.format("dd-MM-yyyy", selDate).toString());
+
+                    }
+                };
                 // Launch Date Picker Dialog
-                DatePickerDialog dpd = new DatePickerDialog(OrderActivity.this,
-                        new DatePickerDialog.OnDateSetListener() {
-
-                            @Override
-                            public void onDateSet(DatePicker view, int year,
-                                                  int monthOfYear, int dayOfMonth) {
-                                // Display Selected date in textbox
-                                txtDate.setText(dayOfMonth + "-"
-                                        + (monthOfYear + 1) + "-" + year);
-
-                            }
-                        }, mYear, mMonth, mDay);
+                DatePickerDialog dpd = new DatePickerDialog(OrderActivity.this,dsl
+                        , mYear, mMonth, mDay);
+                dpd.setButton(DialogInterface.BUTTON_POSITIVE, "Odaberi",dpd);
+                dpd.setButton(DialogInterface.BUTTON_NEGATIVE, "Odustani",dpd);
                 dpd.show();
             }
             if (v == txtTime) {
@@ -160,20 +184,24 @@ public class OrderActivity extends BaseActivity{
                 mMinute = c.get(Calendar.MINUTE);
 
                 // Launch Time Picker Dialog
-                TimePickerDialog tpd = new TimePickerDialog(OrderActivity.this,
-                        new TimePickerDialog.OnTimeSetListener() {
+                TimePickerDialog.OnTimeSetListener tsl=new TimePickerDialog.OnTimeSetListener() {
 
-                            @Override
-                            public void onTimeSet(TimePicker view, int hourOfDay,
-                                                  int minute) {
-                                // Display Selected time in textbox
-                                txtTime.setText(hourOfDay + ":" + minute);
-                            }
-                        }, mHour, mMinute, false);
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay,
+                                          int minute) {
+                        txtTime.setText(String.format("%02d", hourOfDay) + ":" + String.format("%02d", minute));
+                    }
+                };
+                tpd = new TimePickerDialog(OrderActivity.this,tsl, mHour, mMinute, true);
+                tpd.setButton(DialogInterface.BUTTON_POSITIVE, "Odaberi",tpd);
+                tpd.setButton(DialogInterface.BUTTON_NEGATIVE, "Odustani",tpd);
+
                 tpd.show();
             }
             if (v == btnNaruci){
                 new setOrder().execute();
+            }else{
+
             }
         }
     };
@@ -231,7 +259,7 @@ public class OrderActivity extends BaseActivity{
                 nameValuePairs.add(new BasicNameValuePair("vrijeme", txtTime.getText().toString()));
                 nameValuePairs.add(new BasicNameValuePair("serviceid", serviceID));
                 nameValuePairs.add(new BasicNameValuePair("userNote", txtNote.getText().toString()));
-                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs,"UTF-8"));
                 // Execute HTTP Post Request
                 HttpResponse response = httpclient.execute(httppost);
 
@@ -251,9 +279,7 @@ public class OrderActivity extends BaseActivity{
 
 
             } catch (ClientProtocolException e) {
-                // TODO Auto-generated catch block
             } catch (IOException e) {
-                // TODO Auto-generated catch block
             }
             return null;
 
