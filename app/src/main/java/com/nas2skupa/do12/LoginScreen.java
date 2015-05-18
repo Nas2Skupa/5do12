@@ -74,6 +74,7 @@ public class LoginScreen extends Activity {
     JSONArray user = null;
     private EditText pass;
     private Button login;
+    private Button register;
 
     @SuppressLint("NewApi")
     @Override
@@ -120,6 +121,7 @@ public class LoginScreen extends Activity {
     private void initialize() {
         setContentView(R.layout.login);
         login = (Button) findViewById(R.id.btnLogin);
+        register = (Button) findViewById(R.id.btnRegister);
         pass = (EditText) findViewById(R.id.password);
         pass.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -128,6 +130,13 @@ public class LoginScreen extends Activity {
                     login.performClick();
                 }
                 return false;
+            }
+        });
+        register.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent in = new Intent(context, Register.class);
+                startActivity(in);
             }
         });
     }

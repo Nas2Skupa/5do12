@@ -52,4 +52,17 @@
         <item>Trnje</item>
         <item>Zagreb - Okolica</item>
     </string-array>
+
+    <!--Register page-->
+    <string name="username">Korisničko ime</string>
+    <string name="name">Ime i prezime</string>
+    <string name="address">Adresa</string>
+    <string name="email">Email</string>
+    <string name="phone">Mobitel</string>
+    <string name="password">Lozinka</string>
+    <string name="repeatPassword">Ponovi lozinku</string>
+    <string name="register">Registriraj se</string>
+    <string name="mandatoryFields">Molimo ispunite sva polja kako bi se mogli registrirati.</string>
+    <string name="passwordsMismatch">Lozinke se ne podudaraju, pokušajte ponovo.</string>
+    <string name="registrationComplete">Registracija uspješna. Molimo aktivirajte svoj račun putem linka koji vam je poslan na email.</string>
 </resources>

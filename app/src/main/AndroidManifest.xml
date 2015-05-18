@@ -50,6 +50,10 @@
             </intent-filter>
         </activity>
         <activity
+            android:name="com.nas2skupa.do12.Register"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
             android:name="com.nas2skupa.do12.HomeScreen"
             android:screenOrientation="portrait" >
         </activity>
