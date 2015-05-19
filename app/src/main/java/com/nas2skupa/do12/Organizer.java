@@ -149,7 +149,7 @@ public class Organizer extends BaseActivity implements OnClickListener {
      * @param year
      */
     private void setGridCellAdapterToDate(int month, int year) {
-        adapter = new GridCellAdapter(getApplicationContext(), R.id.calendar_day_gridcell, month, year);
+        adapter.setCalendarDate(year, month, 1);
         updateCalendar(month, year);
     }
 
@@ -196,12 +196,12 @@ public class Organizer extends BaseActivity implements OnClickListener {
         private static final String tag = "GridCellAdapter";
         private final Context _context;
 
-        private final List<String> list;
+        private List<String> list;
         private static final int DAY_OFFSET = 2;
         private final String[] weekdays = new String[]{"Ned", "Pon", "Uto", "Sri", "Čet", "Pet", "Sub"};
         private final String[] months = {"Siječanj", "Veljača", "Ožujak", "Travanj", "Svibanj", "Lipanj", "Srpanj", "Kolovoz", "Rujan", "Listopad", "Studeni", "Prosinac"};
         private final int[] daysOfMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-        private final int month, year;
+        private int month, year;
         private int daysInMonth, prevMonthDays;
         private Calendar currentDate;
         private int currentDayOfMonth;
@@ -236,6 +236,16 @@ public class Organizer extends BaseActivity implements OnClickListener {
             currentMonth.setText(getMonthAsString(month - 1) + ", " + year + ".");
             printMonth(month, year);
 
+            refreshCalendar();
+        }
+
+        public void setCalendarDate(int year, int month, int day) {
+            this.list = new ArrayList<String>();
+            this.month = month;
+            this.year = year;
+
+            currentMonth.setText(getMonthAsString(month - 1) + ", " + year + ".");
+            printMonth(month, year);
             refreshCalendar();
         }
 
