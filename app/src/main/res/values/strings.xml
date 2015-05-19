@@ -15,7 +15,7 @@
     <string name="gcm_project_id">noted-trail-758</string>
     <string name="gcm_project_no">492542058520</string>
 
-    
+
     <string name="city_prompt">GRAD</string>
  
     <string-array name="city_arrays">
@@ -52,6 +52,8 @@
         <item>Trnje</item>
         <item>Zagreb - Okolica</item>
     </string-array>
+
+    <string name="pleaseWait">Molimo pričekajte...</string>
 
     <!--Register page-->
     <string name="username">Korisničko ime</string>

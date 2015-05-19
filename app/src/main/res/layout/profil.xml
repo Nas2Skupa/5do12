@@ -4,7 +4,8 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@drawable/back">
+    android:background="@drawable/back"
+    android:clickable="true">
     <TextView
         android:id="@+id/subcatname"
         android:layout_width="260dp"

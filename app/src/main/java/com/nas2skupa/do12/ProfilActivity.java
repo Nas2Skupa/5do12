@@ -247,7 +247,7 @@ public class ProfilActivity extends BaseActivity {
             super.onPreExecute();
             // Showing progress dialog
             pDialog = new ProgressDialog(ProfilActivity.this);
-            pDialog.setMessage("Please wait...");
+            pDialog.setMessage(getString(R.string.pleaseWait));
             pDialog.setCancelable(false);
             pDialog.show();
         }

@@ -110,7 +110,7 @@ public class Favorites extends BaseActivity {
             super.onPreExecute();
             // Showing progress dialog
             pDialog = new ProgressDialog(Favorites.this);
-            pDialog.setMessage("Please wait...");
+            pDialog.setMessage(getString(R.string.pleaseWait));
             pDialog.setCancelable(false);
             pDialog.show();
  

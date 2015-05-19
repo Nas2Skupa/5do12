@@ -3,7 +3,8 @@
     android:id="@+id/homescr"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/back">
+    android:background="@drawable/back"
+    android:clickable="true">
 
     <GridLayout
         android:id="@+id/gridHome"

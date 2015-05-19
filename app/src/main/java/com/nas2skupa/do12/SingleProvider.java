@@ -221,7 +221,7 @@ public class SingleProvider extends BaseActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             pDialog = new ProgressDialog(SingleProvider.this);
-            pDialog.setMessage("Please wait...");
+            pDialog.setMessage(getString(R.string.pleaseWait));
             pDialog.setCancelable(false);
             pDialog.show();
 
@@ -306,7 +306,7 @@ public class SingleProvider extends BaseActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             pDialog = new ProgressDialog(SingleProvider.this);
-            pDialog.setMessage("Please wait...");
+            pDialog.setMessage(getString(R.string.pleaseWait));
             pDialog.setCancelable(false);
             pDialog.show();
 

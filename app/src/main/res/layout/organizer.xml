@@ -5,7 +5,8 @@
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
     android:background="@drawable/back"
-    android:weightSum="1">
+    android:weightSum="1"
+    android:clickable="true">
 
     <LinearLayout
 		android:orientation="horizontal"

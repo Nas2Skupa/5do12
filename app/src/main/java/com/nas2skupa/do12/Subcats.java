@@ -116,7 +116,7 @@ public class Subcats extends BaseListActivity {
             super.onPreExecute();
             // Showing progress dialog
             pDialog = new ProgressDialog(Subcats.this);
-            pDialog.setMessage("Please wait...");
+            pDialog.setMessage(getString(R.string.pleaseWait));
             pDialog.setCancelable(false);
             pDialog.show();
  

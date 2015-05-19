@@ -25,7 +25,7 @@ public class HttpRequest {
             super.onPreExecute();
             if(silent) return;
             progressDialog = new ProgressDialog(context);
-            progressDialog.setMessage("Molimo pričekajte...");
+            progressDialog.setMessage(context.getString(R.string.pleaseWait));
             progressDialog.setCancelable(false);
             progressDialog.show();
         }

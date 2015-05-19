@@ -238,7 +238,7 @@ public class OrderActivity extends BaseActivity{
             super.onPreExecute();
             // Showing progress dialog
             pDialog = new ProgressDialog(OrderActivity.this);
-            pDialog.setMessage("Please wait...");
+            pDialog.setMessage(getString(R.string.pleaseWait));
             pDialog.setCancelable(false);
             pDialog.show();
         }
