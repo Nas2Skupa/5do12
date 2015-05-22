@@ -34,11 +34,7 @@ public class CitiesFilter {
         currentDistrict = sharedPreferences.getString("district", "");
 
         cities.addAll(Globals.getCities(addAll));
-        if (cities.contains(currentCity))
-            citiesSpinner.setSelection(cities.indexOf(currentCity));
         districts.addAll(Globals.getDistricts(currentCity,addAll));
-        if (districts.contains(currentDistrict))
-            districtsSpinner.setSelection(districts.indexOf(currentDistrict));
 
         citiesAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item, cities);
         districtsAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item, districts);
@@ -47,6 +43,11 @@ public class CitiesFilter {
 
         this.citiesSpinner.setAdapter(citiesAdapter);
         this.districtsSpinner.setAdapter(districtsAdapter);
+
+        if (cities.contains(currentCity))
+            citiesSpinner.setSelection(cities.indexOf(currentCity));
+        if (districts.contains(currentDistrict))
+            districtsSpinner.setSelection(districts.indexOf(currentDistrict));
 
         citiesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
