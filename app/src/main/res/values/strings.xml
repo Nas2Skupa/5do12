@@ -15,6 +15,7 @@
     <string name="gcm_project_id">noted-trail-758</string>
     <string name="gcm_project_no">492542058520</string>
 
+    <string name="serverUrl">http://nas2skupa.com/5do12/</string>
 
     <string name="city_prompt">GRAD</string>
  
@@ -54,6 +55,7 @@
     </string-array>
 
     <string name="pleaseWait">Molimo pričekajte...</string>
+    <string name="serverError">Došlo je do greške u radu sa serverom. Molimo pokušajte ponovo kasnije.</string>
 
     <!--Register page-->
     <string name="username">Korisničko ime</string>

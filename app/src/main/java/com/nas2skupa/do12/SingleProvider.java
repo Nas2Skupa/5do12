@@ -13,7 +13,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
-import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -33,7 +32,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class SingleProvider extends BaseActivity {
 
@@ -70,13 +68,13 @@ public class SingleProvider extends BaseActivity {
     View footer = null;
     private RatingBar ratingBar;
     private RatingBar ratingBarBig;
-    private float userRating;
     TextView lblAbout,lblEmail,lblWeb, lblAddress;
     ImageView btnFav, btnVise, btnMap;
     Dialog favDialog;
     LinearLayout moreLayout;
     Boolean detailOn = false, isFav=false;
     ProviderClass proClass;
+    private Context context;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -104,6 +102,8 @@ public class SingleProvider extends BaseActivity {
         lblEmail.setOnClickListener(clickHandler);
         lblWeb.setOnClickListener(clickHandler);
         lblAddress.setOnClickListener(clickHandler);
+
+        context = this;
 
         if(proClass.proFav.equals("1")){
             isFav=true;
@@ -141,14 +141,36 @@ public class SingleProvider extends BaseActivity {
         starsBig.getDrawable(2).setColorFilter(Color.parseColor("#ffadbb02"), PorterDuff.Mode.SRC_IN);
         ratingBarBig.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
-            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-                if (fromUser) {
-                    userRating = rating;
-                    new sendRating().execute(null, null, null);
+            public void onRatingChanged(final RatingBar ratingBar, float rating, boolean fromUser) {
+                if (fromUser) sendRating(rating);
+            }
+        });
+    }
+
+    private void sendRating(float rating) {
+        if (rating == 0) return;
+        final SharedPreferences prefs = getSharedPreferences("user", Context.MODE_PRIVATE);
+        String userId = prefs.getString("id", "");
+        Uri uri = new Uri.Builder().encodedPath("http://nas2skupa.com/5do12/setRate.aspx")
+                .appendQueryParameter("userId", userId)
+                .appendQueryParameter("proId", provider.optString(TAG_ID, "-1"))
+                .appendQueryParameter("rate", "" + (int) rating)
+                .build();
+        new HttpRequest(context, uri, false).setOnHttpResultListener(new HttpRequest.OnHttpResultListener() {
+            @Override
+            public void onHttpResult(String result) {
+                ratingBar.setVisibility(View.VISIBLE);
+                ratingBarBig.setVisibility(View.GONE);
+                btnFav.setVisibility(View.VISIBLE);
+                if (result != null) {
+                    listArray.clear();
+                    adapter.clear();
+                    new GetProvider().execute();
                 }
             }
         });
     }
+
     View.OnClickListener phoneClick = new View.OnClickListener(){
         public void onClick(View v) {
             try {
@@ -165,7 +187,7 @@ public class SingleProvider extends BaseActivity {
     View.OnClickListener clickHandler = new View.OnClickListener() {
         public void onClick(View v) {
             if (v == btnFav) {
-                new addToFav().execute(null,null,null);
+                setFavorite(!isFav);
             }
             if(v==lblEmail){
                 try{
@@ -216,51 +238,22 @@ public class SingleProvider extends BaseActivity {
         }
     };
 
-    private class addToFav extends AsyncTask<Object, Object, Object> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            pDialog = new ProgressDialog(SingleProvider.this);
-            pDialog.setMessage(getString(R.string.pleaseWait));
-            pDialog.setCancelable(false);
-            pDialog.show();
-
-        }
-        @Override
-        protected Object doInBackground(Object[] params) {
-            String msg = "";
-            try {
-                final SharedPreferences prefs = getSharedPreferences("user", Context.MODE_PRIVATE);
-                String userId = prefs.getString("id", "");
-                ServiceHandler sh = new ServiceHandler();
-                String setFav="1";
-                if(isFav==true){
-                    setFav="0";
-
-                }
-                String url = "http://nas2skupa.com/5do12/setFav.aspx?userId=" + userId + "&proId=" + provider.getString(TAG_ID) + "&fav="+setFav;
-                msg = sh.makeServiceCall(url, ServiceHandler.GET);
-                Log.d("Response: ", "> " + msg);
-            } catch (Exception ex) {
-                Log.d("Error :", ex.getMessage());
+    private void setFavorite(final boolean favorite) {
+        btnFav.setImageResource(favorite ? R.drawable.fav_icon_enabled : R.drawable.fav_icon);
+        final SharedPreferences prefs = getSharedPreferences("user", Context.MODE_PRIVATE);
+        String userId = prefs.getString("id", "");
+        Uri uri = new Uri.Builder().encodedPath("http://nas2skupa.com/5do12/setFav.aspx")
+                .appendQueryParameter("userId", userId)
+                .appendQueryParameter("proId", provider.optString(TAG_ID, "-1"))
+                .appendQueryParameter("fav", favorite ? "1" : "0")
+                .build();
+        new HttpRequest(context, uri, true).setOnHttpResultListener(new HttpRequest.OnHttpResultListener() {
+            @Override
+            public void onHttpResult(String result) {
+                if (result != null) isFav = favorite;
+                btnFav.setImageResource(isFav ? R.drawable.fav_icon_enabled : R.drawable.fav_icon);
             }
-            return msg;
-        }
-
-        @Override
-        protected void onPostExecute(Object o) {
-            super.onPostExecute(o);
-            if (pDialog.isShowing())
-                pDialog.dismiss();
-            Log.d("Post exe",o.toString());
-            if(isFav==false){
-                isFav=true;
-                btnFav.setImageResource(R.drawable.fav_icon_enabled);
-            }else{
-                isFav=false;
-                btnFav.setImageResource(R.drawable.fav_icon);
-            }
-        }
+        });
     }
 
     public void rateProvider(View view) {
@@ -269,43 +262,12 @@ public class SingleProvider extends BaseActivity {
         btnFav.setVisibility(View.GONE);
     }
 
-    private class sendRating extends AsyncTask<Object, Object, Object> {
-        @Override
-        protected Object doInBackground(Object[] params) {
-            String msg = "";
-            try {
-                if (userRating == 0) return null;
-                final SharedPreferences prefs = getSharedPreferences("user", Context.MODE_PRIVATE);
-                String userId = prefs.getString("id", "");
-                ServiceHandler sh = new ServiceHandler();
-                String url = "http://nas2skupa.com/5do12/setRate.aspx?userId=" + userId + "&proId=" + provider.getString(TAG_ID) + "&rate=" + (int) userRating;
-                msg = sh.makeServiceCall(url, ServiceHandler.GET);
-                Log.d("Response: ", "> " + msg);
-            } catch (Exception ex) {
-                Log.d("Error :", ex.getMessage());
-            }
-            return msg;
-        }
-
-        @Override
-        protected void onPostExecute(Object o) {
-            super.onPostExecute(o);
-            ratingBar.setVisibility(View.VISIBLE);
-            ratingBarBig.setVisibility(View.GONE);
-            btnFav.setVisibility(View.VISIBLE);
-            if (o != null) {
-                listArray.clear();
-                adapter.clear();
-                new GetProvider().execute();
-            }
-        }
-    }
-
     private class GetProvider extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pDialog = new ProgressDialog(SingleProvider.this);
+            if(pDialog == null)
+                pDialog = new ProgressDialog(SingleProvider.this);
             pDialog.setMessage(getString(R.string.pleaseWait));
             pDialog.setCancelable(false);
             pDialog.show();

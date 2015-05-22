@@ -42,6 +42,7 @@ public class ServiceHandler {
      * */
     public String makeServiceCall(String url, int method,
             List<NameValuePair> params) {
+        response = null;
         try {
             // http client
             DefaultHttpClient httpClient = new DefaultHttpClient();

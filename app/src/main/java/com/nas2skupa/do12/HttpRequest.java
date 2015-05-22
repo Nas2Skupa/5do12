@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.widget.Toast;
 
 /**
  * Created by Ranko on 22.11.2014..
@@ -41,7 +42,10 @@ public class HttpRequest {
             super.onPostExecute(result);
             if (!silent && progressDialog.isShowing())
                 progressDialog.dismiss();
-            onHttpResultListener.onHttpResult(result);
+            if (result == null)
+                Toast.makeText(context, context.getText(R.string.serverError), Toast.LENGTH_SHORT).show();
+            if (onHttpResultListener != null)
+                onHttpResultListener.onHttpResult(result);
         }
     }
 
