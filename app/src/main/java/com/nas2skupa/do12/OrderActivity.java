@@ -1,6 +1,7 @@
 package com.nas2skupa.do12;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -13,7 +14,6 @@ import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -33,10 +33,12 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.NumberPicker;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.content.SharedPreferences;
+import android.widget.Toast;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -68,6 +70,9 @@ public class OrderActivity extends BaseActivity{
     TimePickerDialog tpd;
     int[] payOpts;
     SimpleDateFormat outputDateFormatter = new SimpleDateFormat("dd-MM-yyyy");
+    private Time today;
+    private Date nowDate;
+    private Calendar calendar;
 
     /** Called when the activity is first created. */
     @Override
@@ -131,10 +136,10 @@ public class OrderActivity extends BaseActivity{
                 payO.setVisibility(View.VISIBLE);
             }
         }
-        Time today = new Time(Time.getCurrentTimezone());
+        today = new Time(Time.getCurrentTimezone());
         today.setToNow();
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-        Date nowDate=Calendar.getInstance().getTime();
+        nowDate = Calendar.getInstance().getTime();
         Log.d("DATUM:", DateFormat.format("dd-MM-yyyy", nowDate).toString());
         txtDate.setText(DateFormat.format("dd-MM-yyyy", nowDate).toString());
         txtTime.setText(String.format("%02d", today.hour)+":"+String.format("%02d", today.minute));
@@ -160,12 +165,13 @@ public class OrderActivity extends BaseActivity{
                     public void onDateSet(DatePicker view, int year,
                                           int monthOfYear, int dayOfMonth) {
                         // Display Selected date in textbox
-                        Calendar calendar = new GregorianCalendar();
+                        calendar = new GregorianCalendar();
                         calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                         calendar.set(Calendar.MONTH, monthOfYear);
                         calendar.set(Calendar.YEAR, year);
-                        Date selDate=calendar.getTime();
+                        Date selDate= calendar.getTime();
                         txtDate.setText(DateFormat.format("dd-MM-yyyy", selDate).toString());
+                        txtTime.setText(String.format("%02d", today.hour) + ":" + String.format("%02d", today.minute));
 
                     }
                 };
@@ -174,6 +180,7 @@ public class OrderActivity extends BaseActivity{
                         , mYear, mMonth, mDay);
                 dpd.setButton(DialogInterface.BUTTON_POSITIVE, "Odaberi",dpd);
                 dpd.setButton(DialogInterface.BUTTON_NEGATIVE, "Odustani",dpd);
+                dpd.getDatePicker().setMinDate(today.toMillis(false));
                 dpd.show();
             }
             if (v == txtTime) {
@@ -189,12 +196,15 @@ public class OrderActivity extends BaseActivity{
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay,
                                           int minute) {
+                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        calendar.set(Calendar.MINUTE, minute);
                         txtTime.setText(String.format("%02d", hourOfDay) + ":" + String.format("%02d", minute));
                     }
                 };
-                tpd = new TimePickerDialog(OrderActivity.this,tsl, mHour, mMinute, true);
+                tpd = new TimePickerDialog(OrderActivity.this,tsl, mHour, mMinute, true, 15);
                 tpd.setButton(DialogInterface.BUTTON_POSITIVE, "Odaberi",tpd);
                 tpd.setButton(DialogInterface.BUTTON_NEGATIVE, "Odustani",tpd);
+
 
                 tpd.show();
             }
@@ -331,6 +341,67 @@ public class OrderActivity extends BaseActivity{
         }
     }
 
-    
-    
+    class TimePickerDialog extends android.app.TimePickerDialog
+    {
+        final OnTimeSetListener mCallback;
+        TimePicker mTimePicker;
+        final int increment;
+        private List<String> displayedValues;
+
+        public TimePickerDialog(Context context, OnTimeSetListener callBack, int hourOfDay, int minute, boolean is24HourView, int increment)
+        {
+            super(context, callBack, hourOfDay, minute/increment, is24HourView);
+            this.mCallback = callBack;
+            this.increment = increment;
+        }
+
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            if (mCallback != null && mTimePicker!=null) {
+                mTimePicker.clearFocus();
+                mCallback.onTimeSet(mTimePicker, mTimePicker.getCurrentHour(),
+                        mTimePicker.getCurrentMinute()*increment);
+            }
+        }
+
+        @Override
+        protected void onStop()
+        {
+            // override and do nothing
+        }
+
+        @Override
+        protected void onCreate(Bundle savedInstanceState)
+        {
+            super.onCreate(savedInstanceState);
+            try
+            {
+                Class<?> rClass = Class.forName("com.android.internal.R$id");
+                Field timePicker = rClass.getField("timePicker");
+                this.mTimePicker = (TimePicker)findViewById(timePicker.getInt(null));
+                Field m = rClass.getField("minute");
+
+                NumberPicker mMinuteSpinner = (NumberPicker)mTimePicker.findViewById(m.getInt(null));
+                mMinuteSpinner.setMinValue(0);
+                mMinuteSpinner.setMaxValue((60/increment)-1);
+                displayedValues = new ArrayList<String>();
+                for(int i=0;i<60;i+=increment)
+                {
+                    displayedValues.add(String.format("%02d", i));
+                }
+                mMinuteSpinner.setDisplayedValues(displayedValues.toArray(new String[0]));
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+        @Override
+        public void onTimeChanged(TimePicker timePicker, int hourOfDay, int minute) {
+            super.onTimeChanged(timePicker, hourOfDay, minute);
+            this.setTitle(hourOfDay + ":" + displayedValues.get(minute));
+        }
+
+    }
+
 }
