@@ -25,6 +25,10 @@ public class CitiesFilter {
     private int addAll=0;
 
     public CitiesFilter(Context context, Spinner citiesSpinner, final Spinner districtsSpinner, int iaddAll) {
+        this(context, citiesSpinner, districtsSpinner, iaddAll, R.layout.spinner_item, R.layout.spiner_dropdown_item);
+    }
+
+    public CitiesFilter(Context context, Spinner citiesSpinner, final Spinner districtsSpinner, int iaddAll, int spinner_item, int spiner_dropdown_item) {
         this.addAll=iaddAll;
         this.citiesSpinner = citiesSpinner;
         this.districtsSpinner = districtsSpinner;
@@ -36,10 +40,10 @@ public class CitiesFilter {
         cities.addAll(Globals.getCities(addAll));
         districts.addAll(Globals.getDistricts(currentCity,addAll));
 
-        citiesAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item, cities);
-        districtsAdapter = new ArrayAdapter<String>(context, R.layout.spinner_item, districts);
-        citiesAdapter.setDropDownViewResource(R.layout.spiner_dropdown_item);
-        districtsAdapter.setDropDownViewResource(R.layout.spiner_dropdown_item);
+        citiesAdapter = new ArrayAdapter<String>(context, spinner_item, cities);
+        districtsAdapter = new ArrayAdapter<String>(context, spinner_item, districts);
+        citiesAdapter.setDropDownViewResource(spiner_dropdown_item);
+        districtsAdapter.setDropDownViewResource(spiner_dropdown_item);
 
         this.citiesSpinner.setAdapter(citiesAdapter);
         this.districtsSpinner.setAdapter(districtsAdapter);

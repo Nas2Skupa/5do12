@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.view.Gravity;
 import android.widget.Toast;
 
 /**
@@ -42,8 +43,12 @@ public class HttpRequest {
             super.onPostExecute(result);
             if (!silent && progressDialog.isShowing())
                 progressDialog.dismiss();
-            if (result == null)
-                Toast.makeText(context, context.getText(R.string.serverError), Toast.LENGTH_SHORT).show();
+            if (result == null || result.contains("HttpException")) {
+                Toast toast = Toast.makeText(context, R.string.serverError, Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                toast.show();
+                result = null;
+            }
             if (onHttpResultListener != null)
                 onHttpResultListener.onHttpResult(result);
         }

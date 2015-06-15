@@ -3,12 +3,14 @@ package com.nas2skupa.do12;
 import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,12 +20,15 @@ import android.widget.Toast;
 public class Register extends Activity {
 
     private Button register;
-    private EditText username;
+    private EditText surname;
     private EditText name;
     private EditText address;
     private EditText email;
     private EditText password;
     private EditText repeatPassword;
+    private EditText code;
+    private Spinner city;
+    private Spinner district;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,8 +36,11 @@ public class Register extends Activity {
 
         setContentView(R.layout.register);
 
-        username = (EditText) findViewById(R.id.username);
+        CitiesFilter citiesFilter = new CitiesFilter(this, (Spinner) findViewById(R.id.city), (Spinner) findViewById(R.id.district), 0, R.layout.register_spinner_item, R.layout.register_spiner_dropdown_item);
         name = (EditText) findViewById(R.id.name);
+        surname = (EditText) findViewById(R.id.surname);
+        city = (Spinner) findViewById(R.id.city);
+        district = (Spinner) findViewById(R.id.district);
         address = (EditText) findViewById(R.id.address);
         email = (EditText) findViewById(R.id.email);
         password = (EditText) findViewById(R.id.password);
@@ -46,13 +54,17 @@ public class Register extends Activity {
                 return false;
             }
         });
+        code = (EditText) findViewById(R.id.code);
+
+        TelephonyManager telephonyManager = (TelephonyManager)getSystemService(this.TELEPHONY_SERVICE);
+        final String imei = telephonyManager.getDeviceId();
 
         register = (Button) findViewById(R.id.send_registration);
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (username.getText().toString().isEmpty() ||
-                    name.getText().toString().isEmpty() ||
+                if (name.getText().toString().isEmpty() ||
+                    surname.getText().toString().isEmpty() ||
                     address.getText().toString().isEmpty() ||
                     email.getText().toString().isEmpty() ||
                     password.getText().toString().isEmpty()) {
@@ -69,18 +81,31 @@ public class Register extends Activity {
                     password.requestFocus();
                 }
                 else {
+                    City curr_city = Globals.cities.get(city.getSelectedItem().toString());
+                    District curr_district = curr_city.districts.get(district.getSelectedItem().toString());
                     Uri uri = new Uri.Builder().encodedPath("http://nas2skupa.com/5do12/registerUser.aspx")
-                        .appendQueryParameter("username", username.getText().toString())
                         .appendQueryParameter("name", name.getText().toString())
+                        .appendQueryParameter("surname", surname.getText().toString())
+                        .appendQueryParameter("quart", curr_district.id)
+                        .appendQueryParameter("city", curr_city.id)
                         .appendQueryParameter("address", address.getText().toString())
                         .appendQueryParameter("email", email.getText().toString())
                         .appendQueryParameter("password", password.getText().toString())
+                        .appendQueryParameter("referral", code.getText().toString())
+                        .appendQueryParameter("imei", imei)
                         .build();
                     new HttpRequest(getApplicationContext(), uri, true)
                         .setOnHttpResultListener(new HttpRequest.OnHttpResultListener() {
                             @Override
                             public void onHttpResult(String result) {
-                                Toast toast = Toast.makeText(Register.this, R.string.registrationComplete, Toast.LENGTH_LONG);
+                                if (result == null) return;
+
+                                Integer user_id = Integer.getInteger(result);
+                                int message = R.string.serverError;
+                                if (user_id != null && user_id == 0) message = R.string.registrationUserExists;
+                                else if (user_id != null && user_id > 0) message = R.string.registrationComplete;
+
+                                Toast toast = Toast.makeText(Register.this, message, Toast.LENGTH_LONG);
                                 toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                                 toast.show();
                             }

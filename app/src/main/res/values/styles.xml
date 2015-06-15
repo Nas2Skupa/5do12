@@ -42,9 +42,7 @@
 
     <style name="RegisterScreen">
         <item name="android:textColor">#666666</item>
-        <item name="android:textStyle">bold</item>
         <item name="android:textSize">18dp</item>
-        <item name="android:paddingTop">15dp</item>
     </style>
 
 </resources>
