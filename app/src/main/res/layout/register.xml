@@ -37,13 +37,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/city"
-                android:layout_margin="7dp" />
+                android:layout_marginTop="10dp" />
 
             <Spinner
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/district"
-                android:layout_margin="7dp" />
+                android:layout_marginTop="10dp" />
 
             <EditText
                 android:layout_width="fill_parent"

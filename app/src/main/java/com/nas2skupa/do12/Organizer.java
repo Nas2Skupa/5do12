@@ -197,8 +197,8 @@ public class Organizer extends BaseActivity implements OnClickListener {
         private final Context _context;
 
         private List<String> list;
-        private static final int DAY_OFFSET = 2;
-        private final String[] weekdays = new String[]{"Ned", "Pon", "Uto", "Sri", "Čet", "Pet", "Sub"};
+        private static final int DAY_OFFSET = 1;
+        private final String[] weekdays = new String[]{"Pon", "Uto", "Sri", "Čet", "Pet", "Sub", "Ned"};
         private final String[] months = {"Siječanj", "Veljača", "Ožujak", "Travanj", "Svibanj", "Lipanj", "Srpanj", "Kolovoz", "Rujan", "Listopad", "Studeni", "Prosinac"};
         private final int[] daysOfMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
         private int month, year;
@@ -208,11 +208,8 @@ public class Organizer extends BaseActivity implements OnClickListener {
         private int currentWeekDay;
         private Button gridcell;
         private TextView num_events_per_day;
-        private HashMap eventsPerMonthMap;
         private final SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MMM-yyyy");
 
-        private ProgressDialog pDialog;
-        private String url;
         public HashMap<String, ArrayList<Order>> orders = new HashMap<String, ArrayList<Order>>();
 
         // Days in Current Month
@@ -362,7 +359,7 @@ public class Organizer extends BaseActivity implements OnClickListener {
             // Compute how much to leave before before the first day of the
             // month.
             // getDay() returns 0 for Sunday.
-            int currentWeekDay = cal.get(Calendar.DAY_OF_WEEK) - 1;
+            int currentWeekDay = (cal.get(Calendar.DAY_OF_WEEK) + 5) % 7;
             trailingSpaces = currentWeekDay;
 
             Log.d(tag, "Week Day:" + currentWeekDay + " is " + getWeekDayAsString(currentWeekDay));
