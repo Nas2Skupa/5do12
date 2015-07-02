@@ -15,7 +15,6 @@ import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class BaseActivity extends Activity {
 	SimpleSideDrawer slide_me;
@@ -31,6 +30,7 @@ public class BaseActivity extends Activity {
         TextView pocTV = (TextView) findViewById(R.id.pocetnabtn);
         TextView orgTV = (TextView) findViewById(R.id.organizatorbtn);
         TextView favTV = (TextView) findViewById(R.id.favoritibtn);
+        TextView porTV = (TextView) findViewById(R.id.porukebtn);
         TextView akcTV = (TextView) findViewById(R.id.akcijebtn);
         TextView odjTV = (TextView) findViewById(R.id.odjavabtn);
         TextView proTV = (TextView) findViewById(R.id.profilbtn);
@@ -47,7 +47,6 @@ public class BaseActivity extends Activity {
         pocTV.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("KLIK!!!!!!!","home");
                 homeActivity();
             }
         });
@@ -55,7 +54,6 @@ public class BaseActivity extends Activity {
 
             @Override
             public void onClick(View v) {
-                Log.d("KLIK!!!!!!!","organizer");
                 listActivity();
             }
         });
@@ -63,15 +61,20 @@ public class BaseActivity extends Activity {
 
             @Override
             public void onClick(View v) {
-                Log.d("KLIK!!!!!!!","favorites");
                 favActivity();
+            }
+        });
+        porTV.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                notificationsActivity();
             }
         });
         akcTV.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                Log.d("KLIK!!!!!!!","actions");
                 vaznoActivity();
             }
         });
@@ -79,7 +82,6 @@ public class BaseActivity extends Activity {
 
             @Override
             public void onClick(View v) {
-                Log.d("KLIK!!!!!!!","profil");
                 profilActivity();
             }
         });
@@ -87,7 +89,6 @@ public class BaseActivity extends Activity {
 
             @Override
             public void onClick(View v) {
-                Log.d("KLIK!!!!!!!","logout");
                 logoutActivity();
             }
         });
@@ -110,8 +111,8 @@ public class BaseActivity extends Activity {
 			favActivity();
 			return true;
 
-		case R.id.akcije:
-			vaznoActivity();
+		case R.id.notificatons:
+			notificationsActivity();
 			return true;
 			
 		case R.id.option:
@@ -150,6 +151,12 @@ public class BaseActivity extends Activity {
         Intent i = new Intent(this, Akcije.class);
         startActivity(i);
     }
+
+    public void notificationsActivity() {
+        Intent i = new Intent(this, Notifications.class);
+        startActivity(i);
+    }
+
     public void profilActivity() {
         Intent i = new Intent(this, ProfilActivity.class);
         startActivity(i);

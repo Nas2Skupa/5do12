@@ -74,6 +74,11 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
+            android:name="com.nas2skupa.do12.Notifications"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
             android:name="com.nas2skupa.do12.Akcije"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >

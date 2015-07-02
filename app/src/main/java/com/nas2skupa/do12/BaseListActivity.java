@@ -3,7 +3,6 @@ package com.nas2skupa.do12;
 import com.navdrawer.SimpleSideDrawer;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.view.KeyEvent;
@@ -14,7 +13,6 @@ import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class BaseListActivity extends ListActivity {
     SimpleSideDrawer slide_me;
@@ -29,6 +27,7 @@ public class BaseListActivity extends ListActivity {
         TextView pocTV = (TextView) findViewById(R.id.pocetnabtn);
         TextView orgTV = (TextView) findViewById(R.id.organizatorbtn);
         TextView favTV = (TextView) findViewById(R.id.favoritibtn);
+        TextView porTV = (TextView) findViewById(R.id.porukebtn);
         TextView akcTV = (TextView) findViewById(R.id.akcijebtn);
         TextView odjTV = (TextView) findViewById(R.id.odjavabtn);
         TextView proTV = (TextView) findViewById(R.id.profilbtn);
@@ -61,6 +60,13 @@ public class BaseListActivity extends ListActivity {
             @Override
             public void onClick(View v) {
                 favActivity();
+            }
+        });
+        porTV.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                notificationsActivity();
             }
         });
         akcTV.setOnClickListener(new OnClickListener() {
@@ -103,8 +109,8 @@ public class BaseListActivity extends ListActivity {
                 favActivity();
                 return true;
 
-            case R.id.akcije:
-                vaznoActivity();
+            case R.id.notificatons:
+                notificationsActivity();
                 return true;
 
             case R.id.option:
@@ -136,6 +142,11 @@ public class BaseListActivity extends ListActivity {
     public void favActivity() {
 
         Intent i = new Intent(this, Favorites.class);
+        startActivity(i);
+    }
+
+    public void notificationsActivity() {
+        Intent i = new Intent(this, Notifications.class);
         startActivity(i);
     }
 

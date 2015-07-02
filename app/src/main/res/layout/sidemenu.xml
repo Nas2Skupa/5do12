@@ -96,6 +96,23 @@
         android:src="@drawable/breakline" />
 
     <TextView
+        android:id="@+id/porukebtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/organizatorbtn"
+        android:text="PORUKE"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:gravity="center_vertical"
+        android:drawablePadding="10dp"
+        android:src="@drawable/pocetnabtn" />
+    <ImageView
+        android:id="@+id/imageView10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/breakline" />
+
+    <TextView
         android:id="@+id/akcijebtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
