@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Poliklinika Sunce"
+            android:id="@+id/provider_name"
+            android:textColor="#666666"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mamografija"
+            android:id="@+id/service_name"
+            android:textColor="#666666"
+            android:textSize="13sp" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/provider_confirm"
+        android:layout_gravity="right"
+        android:src="@drawable/nar_ponudi"
+        android:tint="@color/greenApp"
+        android:paddingLeft="5dp" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/user_confirm"
+        android:layout_gravity="right"
+        android:src="@drawable/nar_ponudi"
+        android:tint="@color/greenApp"
+        android:paddingLeft="5dp" />
+
+</LinearLayout>

@@ -1,5 +1,7 @@
 package com.nas2skupa.do12;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import org.json.JSONObject;
@@ -12,7 +14,7 @@ import java.util.Date;
 /**
  * Created by ranko on 2.11.2014..
  */
-public class Order {
+public class Order implements Parcelable {
     public String id;
     public String proId;
     public String proName;
@@ -29,7 +31,7 @@ public class Order {
     public String providerNote;
 
     public Order(JSONObject jsonObj) {
-        DateFormat df = new SimpleDateFormat("M/d/yyyy hh:mm:ss a");
+        DateFormat df = new SimpleDateFormat("M/d/yyyy hh:mm:ss aa");
         DateFormat tf = new SimpleDateFormat("HH:mm:ss");
 
         try {
@@ -51,5 +53,18 @@ public class Order {
             Log.e("Order", "Invalid JSON data object");
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(proName);
+        parcel.writeString(serviceName);
+        parcel.writeString(providerConfirm);
+        parcel.writeString(userConfirm);
     }
 }

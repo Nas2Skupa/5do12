@@ -114,20 +114,29 @@ public class Organizer extends BaseActivity implements OnClickListener {
         String startTime = data.getString("startTime");
         String endTime = data.getString("endTime");
         String message = String.format("Vaš termin %s u %s sati je %s", date, startTime.substring(0, 5), confirmed ? "potvrđen." : "otkazan.");
-        new AlertDialog.Builder(this)
-                .setTitle(provider)
-                .setMessage(message)
-                .setPositiveButton("Potvrdi", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        sendConfirmation(orderId, "1");
-                    }
-                })
-                .setNegativeButton("Otkaži", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        sendConfirmation(orderId, "2");
-                    }
-                })
-                .show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(provider);
+        builder.setMessage(message);
+        if (confirmed) {
+            builder.setPositiveButton("Potvrdi", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    sendConfirmation(orderId, "1");
+                }
+            });
+            builder.setNegativeButton("Otkaži", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    sendConfirmation(orderId, "2");
+                }
+            });
+        }
+        else {
+            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    sendConfirmation(orderId, "2");
+                }
+            });
+        }
+        builder.show();
     }
 
     private void sendConfirmation(String orderId, String confirmed) {

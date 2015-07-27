@@ -56,7 +56,7 @@ public class SearchActivity extends BaseActivity {
         context = this;
         header = getLayoutInflater().inflate(R.layout.listview_header_row, null);
         filter = getLayoutInflater().inflate(R.layout.listview_filter_row, null);
-        adapter = new ProviderAdapter(this, R.layout.listview_item_row, listArray);
+        adapter = new ProviderAdapter(this, R.layout.listview_provider_row, listArray);
         preferences = getSharedPreferences("user", Context.MODE_PRIVATE);
         getSubCatSettings("Pretraživanje", "#adbb00", header);
 

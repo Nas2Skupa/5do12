@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -22,11 +23,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Notifications extends BaseActivity {
 
     private ListView listView1;
-    ArrayList<ProviderClass> listArray = new ArrayList<ProviderClass>();
+    ArrayList<Order> listArray = new ArrayList<Order>();
     // URL to get contacts JSON
     private Uri baseUri = new Uri.Builder().encodedPath("http://nas2skupa.com/5do12/getAkc.aspx").build();
     // JSON Node names
@@ -38,96 +40,62 @@ public class Notifications extends BaseActivity {
     View header = null;
     View filter = null;
     private Context context;
-    private ProviderAdapter adapter;
+    private NotificationsAdapter adapter;
     private SharedPreferences preferences;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.akclist);
+        setContentView(R.layout.listview_layout);
 
         context = this;
         header = getLayoutInflater().inflate(R.layout.listview_header_row, null);
-        filter = getLayoutInflater().inflate(R.layout.listview_filter_row, null);
-        adapter = new ProviderAdapter(this, R.layout.listview_item_row, listArray);
+//        filter = getLayoutInflater().inflate(R.layout.listview_filter_row, null);
+        adapter = new NotificationsAdapter(this, R.layout.listview_notification_row, listArray);
         preferences = getSharedPreferences("user", Context.MODE_PRIVATE);
-        getSubCatSettings("akcija", "#0090db", header);
+        getSubCatSettings("poruke", "#0090db", header);
 
         listView1 = (ListView) findViewById(R.id.listView1);
         listView1.addHeaderView(header);
-        listView1.addHeaderView(filter);
+//        listView1.addHeaderView(filter);
         listView1.setAdapter(adapter);
         listView1.setOnItemClickListener(new OnItemClickListener() {
             @Override
             @SuppressLint("NewApi")
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-                // getting values from selected ListItem
-
-                ProviderAdapter.ProviderHolder holder = (ProviderAdapter.ProviderHolder)view.getTag();
-                ProviderClass providerclass = (ProviderClass)holder.proObj;
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                NotificationsAdapter.NotificationsHolder holder = (NotificationsAdapter.NotificationsHolder) view.getTag();
+                Order orderclass = (Order)holder.orderObj;
                 Bundle b = new Bundle();
-                b.putParcelable("providerclass", providerclass);
-                catSettings = getCatSett(Integer.parseInt(providerclass.catID));
-                b.putString("color", catSettings[1]);
-                Intent in = new Intent(getApplicationContext(),
-                        SingleProvider.class);
-                in.putExtras(b);
-                startActivity(in);
+                b.putParcelable("orderclass", orderclass);
+
+                // TODO: digni popup
             }
         });
 
-        CitiesFilter citiesFilter = new CitiesFilter(this, (Spinner) findViewById(R.id.cities), (Spinner) findViewById(R.id.districts),0);
-        citiesFilter.setOnFilterChangedListener(new CitiesFilter.OnFilterChangedListener() {
-            @Override
-            public void onFilterChanged(String city, String district) {
-                Uri.Builder builder = baseUri.buildUpon();
-                builder.appendQueryParameter("u", preferences.getString("id", ""));
-                builder.appendQueryParameter("countId", "1");
-                City cityObj = Globals.cities.get(city);
-                if (cityObj != null) {
-                    builder.appendQueryParameter("cid", cityObj.id);
-                    District districtObj = cityObj.districts.get(district);
-                    if (districtObj != null)
-                        builder.appendQueryParameter("qid", districtObj.id);
-                }
-                new HttpRequest(context, builder.build(), false).setOnHttpResultListener(new HttpRequest.OnHttpResultListener() {
+        final SharedPreferences prefs = getSharedPreferences("user", Context.MODE_PRIVATE);
+        String userId = prefs.getString("id", "");
+        Uri uri = new Uri.Builder().encodedPath("http://nas2skupa.com/5do12/getOrders.aspx")
+                .appendQueryParameter("userId", userId)
+                .appendQueryParameter("year", String.valueOf("2015"))
+                .appendQueryParameter("month", String.valueOf("7"))
+                .build();
+        new HttpRequest(getApplicationContext(), uri, true)
+                .setOnHttpResultListener(new HttpRequest.OnHttpResultListener() {
                     @Override
                     public void onHttpResult(String result) {
                         parseServerResult(result);
                     }
                 });
-            }
-        });
     }
 
     private void parseServerResult(String result) {
         listArray.clear();
         try {
             JSONObject jsonObj = new JSONObject(result);
-            providers = jsonObj.getJSONArray(TAG_ARRAY);
-            for (int i = 0; i < providers.length(); i++) {
-                JSONObject c = providers.getJSONObject(i);
-                String id = c.getString(TAG_ID);
-                String name = c.getString(TAG_NAME);
-                String catID = c.getString(TAG_CAT);
-                String favore = c.getString("fav");
-                String action = c.getString("akcija");
-                int fav = R.drawable.blank;
-                int akcija = R.drawable.blank;
-                if (favore.equals("1")) {
-                    fav = R.drawable.fav_icon_enabled;
-                }
-                if (action.equals("1")) {
-                    akcija = R.drawable.akcija_icon;
-                }
-                float rating = 0;
-                try {
-                    rating = Float.parseFloat(c.getString("rating"));
-                } catch (NumberFormatException e) {
-                }
-                ProviderClass currProvider = new ProviderClass(id, name, favore, catID, fav, akcija, rating);
-                listArray.add(currProvider);
+            JSONArray jsonArray = jsonObj.getJSONArray("orders");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                Order order = new Order(jsonArray.getJSONObject(i));
+                listArray.add(order);
             }
         } catch (JSONException e) {
             Log.e("ActionHttpRequest", "Error parsing server data.");

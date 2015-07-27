@@ -17,7 +17,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -179,7 +178,7 @@ public class Favorites extends BaseActivity {
              * Updating parsed JSON data into ListView
              * */
             ProviderAdapter adapter = new ProviderAdapter(Favorites.this,
-            		R.layout.listview_item_row, listArray);
+            		R.layout.listview_provider_row, listArray);
            
            
            

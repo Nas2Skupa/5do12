@@ -68,7 +68,7 @@ public class ProviderList extends BaseActivity {
         context = this;
         header = getLayoutInflater().inflate(R.layout.listview_header_row, null);
         filter = getLayoutInflater().inflate(R.layout.listview_filter_row, null);
-        adapter = new ProviderAdapter(this, R.layout.listview_item_row, listArray);
+        adapter = new ProviderAdapter(this, R.layout.listview_provider_row, listArray);
         preferences = getSharedPreferences("user", Context.MODE_PRIVATE);
         getSubCatSettings(subcat, color, header);
 
@@ -143,10 +143,10 @@ public class ProviderList extends BaseActivity {
                             for (ProviderClass provider : listArray)
                                 if (provider.akcijaIcon == R.drawable.akcija_icon)
                                     filteredList.add(provider);
-                            adapter = new ProviderAdapter(context, R.layout.listview_item_row, filteredList);
+                            adapter = new ProviderAdapter(context, R.layout.listview_provider_row, filteredList);
                             checkedItems.push(R.id.akcijeChbox);
                         } else
-                            adapter = new ProviderAdapter(context, R.layout.listview_item_row, listArray);
+                            adapter = new ProviderAdapter(context, R.layout.listview_provider_row, listArray);
 
                         RadioGroup radioGroup = (RadioGroup) ((AlertDialog) dialog).findViewById(R.id.sortGrp);
                         switch (radioGroup.getCheckedRadioButtonId()) {
