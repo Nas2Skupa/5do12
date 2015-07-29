@@ -121,7 +121,7 @@ public class ProviderList extends BaseActivity {
                 new HttpRequest(context, builder.build(), false).setOnHttpResultListener(new HttpRequest.OnHttpResultListener() {
                     @Override
                     public void onHttpResult(String result) {
-                        parseServerResult(result);
+                        if (result != null) parseServerResult(result);
                     }
                 });
             }
@@ -180,7 +180,7 @@ public class ProviderList extends BaseActivity {
                         listView1.setAdapter(adapter);
                     }
                 })
-                .setNegativeButton("Zatvori", null)
+                .setNegativeButton(R.string.close, null)
                 .show();
         for (int id : checkedItems)
             ((CompoundButton) dialog.findViewById(id)).setChecked(true);

@@ -53,6 +53,7 @@ public class Organizer extends BaseActivity implements OnClickListener {
     private int month, year;
     private final DateFormat dateFormatter = new DateFormat();
     private static final String dateTemplate = "MMMM yyyy";
+    private Context context;
 
     /**
      * Called when the activity is first created.
@@ -60,6 +61,8 @@ public class Organizer extends BaseActivity implements OnClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        context = this;
 
         setContentView(R.layout.organizer);
 
@@ -114,23 +117,23 @@ public class Organizer extends BaseActivity implements OnClickListener {
         String startTime = data.getString("startTime");
         String endTime = data.getString("endTime");
         String message = String.format("Vaš termin %s u %s sati je %s", date, startTime.substring(0, 5), confirmed ? "potvrđen." : "otkazan.");
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(provider);
         builder.setMessage(message);
         if (confirmed) {
-            builder.setPositiveButton("Potvrdi", new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     sendConfirmation(orderId, "1");
                 }
             });
-            builder.setNegativeButton("Otkaži", new DialogInterface.OnClickListener() {
+            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     sendConfirmation(orderId, "2");
                 }
             });
         }
         else {
-            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     sendConfirmation(orderId, "2");
                 }
@@ -144,11 +147,11 @@ public class Organizer extends BaseActivity implements OnClickListener {
                 .appendQueryParameter("orderId", orderId)
                 .appendQueryParameter("confirmed", confirmed)
                 .build();
-        new HttpRequest(getApplicationContext(), uri, true)
+        new HttpRequest(context, uri, true)
                 .setOnHttpResultListener(new HttpRequest.OnHttpResultListener() {
                     @Override
                     public void onHttpResult(String result) {
-                        adapter.refreshCalendar();
+                        if (result != null) adapter.refreshCalendar();
                     }
                 });
     }
@@ -264,11 +267,11 @@ public class Organizer extends BaseActivity implements OnClickListener {
                     .appendQueryParameter("year", String.valueOf(year))
                     .appendQueryParameter("month", String.valueOf(month))
                     .build();
-            new HttpRequest(getApplicationContext(), uri, true)
+            new HttpRequest(context, uri, true)
                     .setOnHttpResultListener(new HttpRequest.OnHttpResultListener() {
                         @Override
                         public void onHttpResult(String result) {
-                            parseServerResult(result);
+                            if (result != null) parseServerResult(result);
                         }
                     });
         }
@@ -515,16 +518,16 @@ public class Organizer extends BaseActivity implements OnClickListener {
                                 selectedItems[which] = isChecked;
                             }
                         });
-                builder.setPositiveButton("Otkaži označene", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(R.string.cancelSelected, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         for (int i = 0; i < count; i++) {
                             if (selectedItems[i])
-                                sendConfirmation(events.get(i).id, "3");
+                                sendConfirmation(events.get(i).id, "2");
                         }
                     }
                 });
             }
-            builder.setNegativeButton("Zatvori", null);
+            builder.setNegativeButton(R.string.close, null);
             builder.show();
         }
 

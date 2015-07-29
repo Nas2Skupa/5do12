@@ -101,7 +101,7 @@ public class SearchActivity extends BaseActivity {
                 new HttpRequest(context, builder.build(), false).setOnHttpResultListener(new HttpRequest.OnHttpResultListener() {
                     @Override
                     public void onHttpResult(String result) {
-                        parseServerResult(result);
+                        if (result != null) parseServerResult(result);
                     }
                 });
             }

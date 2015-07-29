@@ -2,14 +2,6 @@
 <resources>
 
     <string name="app_name">5do12</string>
-    <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="usernametxt">Korisničko ime</string>
-    <string name="passtxt">Lozinka</string>
-    <string name="btntxt">Klik</string>
-    <string name="btnLogin">Prijavi se</string>
-    <string name="home_title">Home</string>
-    <string name="fav_title">Favorites</string>
     <string name="currency"> kn</string>
 
     <string name="gcm_project_id">noted-trail-758</string>
@@ -54,8 +46,15 @@
         <item>Zagreb - Okolica</item>
     </string-array>
 
+    <!--Http request strings-->
     <string name="pleaseWait">Molimo pričekajte...</string>
     <string name="serverError">Došlo je do greške u radu sa serverom. Molimo pokušajte ponovo kasnije.</string>
+    <string name="confirmationSent">Odgovor je poslan.</string>
+
+    <!--Login page-->
+    <string name="usernametxt">Korisničko ime</string>
+    <string name="passtxt">Lozinka</string>
+    <string name="btnLogin">Prijavi se</string>
 
     <!--Register page-->
     <string name="name">Ime</string>
@@ -71,4 +70,13 @@
     <string name="registrationUserExists">Korisnik s ovom email adresom je već registriran.</string>
     <string name="registrationComplete">Registracija uspješna. Molimo aktivirajte svoj račun putem linka koji vam je poslan na email.</string>
     <string name="code">Registracijski kod</string>
+
+
+    <string name="cancel">Otkaži</string>
+    <string name="confirm">Potvrdi</string>
+    <string name="close">Zatvori</string>
+    <string name="cancelSelected">Otkaži označene</string>
+    <string name="ok">Ok</string>
+    <string name="canceled">Otkazano</string>
+
 </resources>

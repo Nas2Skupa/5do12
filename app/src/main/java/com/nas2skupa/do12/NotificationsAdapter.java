@@ -51,7 +51,8 @@ public class NotificationsAdapter extends ArrayAdapter<Order>{
         holder.provider.setText(order.proName);
         holder.service.setText(order.serviceName);
         holder.providerConfirm.setImageResource(GetIcon(order.providerConfirm));
-        holder.userConfirm.setImageResource(GetIcon(order.userConfirm));
+        if (!order.providerConfirm.equals("2"))
+            holder.userConfirm.setImageResource(GetIcon(order.userConfirm));
         holder.orderObj = order;
         row.setTag(holder);
         return row;
@@ -60,7 +61,7 @@ public class NotificationsAdapter extends ArrayAdapter<Order>{
     public int GetIcon(String confirm) {
         if (confirm.equals("1")) return R.drawable.nar_potvrdi;
         else if (confirm.equals("2")) return R.drawable.nar_odbij;
-        else return R.drawable.nar_ponudi;
+        return R.drawable.nar_ponudi;
     }
 
     public static class NotificationsHolder
@@ -69,6 +70,6 @@ public class NotificationsAdapter extends ArrayAdapter<Order>{
         TextView service;
         ImageView providerConfirm;
         ImageView userConfirm;
-        Parcelable orderObj;
+        Order orderObj;
     }
 }

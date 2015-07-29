@@ -1,47 +1,38 @@
 package com.nas2skupa.do12;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
-import android.content.Intent;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Notifications extends BaseActivity {
 
     private ListView listView1;
     ArrayList<Order> listArray = new ArrayList<Order>();
-    // URL to get contacts JSON
-    private Uri baseUri = new Uri.Builder().encodedPath("http://nas2skupa.com/5do12/getAkc.aspx").build();
-    // JSON Node names
-    private static final String TAG_ARRAY = "akcije";
-    private static final String TAG_ID = "ID";
-    private static final String TAG_NAME = "name";
-    private static final String TAG_CAT = "category";
-    JSONArray providers = null;
     View header = null;
-    View filter = null;
+    //    View filter = null;
     private Context context;
     private NotificationsAdapter adapter;
-    private SharedPreferences preferences;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,7 +43,6 @@ public class Notifications extends BaseActivity {
         header = getLayoutInflater().inflate(R.layout.listview_header_row, null);
 //        filter = getLayoutInflater().inflate(R.layout.listview_filter_row, null);
         adapter = new NotificationsAdapter(this, R.layout.listview_notification_row, listArray);
-        preferences = getSharedPreferences("user", Context.MODE_PRIVATE);
         getSubCatSettings("poruke", "#0090db", header);
 
         listView1 = (ListView) findViewById(R.id.listView1);
@@ -64,14 +54,14 @@ public class Notifications extends BaseActivity {
             @SuppressLint("NewApi")
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 NotificationsAdapter.NotificationsHolder holder = (NotificationsAdapter.NotificationsHolder) view.getTag();
-                Order orderclass = (Order)holder.orderObj;
-                Bundle b = new Bundle();
-                b.putParcelable("orderclass", orderclass);
-
-                // TODO: digni popup
+                showOrderDialog(holder.orderObj);
             }
         });
 
+        getMessages();
+    }
+
+    private void getMessages() {
         final SharedPreferences prefs = getSharedPreferences("user", Context.MODE_PRIVATE);
         String userId = prefs.getString("id", "");
         Uri uri = new Uri.Builder().encodedPath("http://nas2skupa.com/5do12/getOrders.aspx")
@@ -79,11 +69,11 @@ public class Notifications extends BaseActivity {
                 .appendQueryParameter("year", String.valueOf("2015"))
                 .appendQueryParameter("month", String.valueOf("7"))
                 .build();
-        new HttpRequest(getApplicationContext(), uri, true)
+        new HttpRequest(context, uri, false)
                 .setOnHttpResultListener(new HttpRequest.OnHttpResultListener() {
                     @Override
                     public void onHttpResult(String result) {
-                        parseServerResult(result);
+                        if (result != null) parseServerResult(result);
                     }
                 });
     }
@@ -102,6 +92,54 @@ public class Notifications extends BaseActivity {
             e.printStackTrace();
         }
         listView1.setAdapter(adapter);
+    }
+
+    private void sendConfirmation(String orderId, String confirmed) {
+        Uri uri = new Uri.Builder().encodedPath("http://nas2skupa.com/5do12/confirmUser.aspx")
+                .appendQueryParameter("orderId", orderId)
+                .appendQueryParameter("confirmed", confirmed)
+                .build();
+        new HttpRequest(context, uri, true)
+                .setOnHttpResultListener(new HttpRequest.OnHttpResultListener() {
+                    @Override
+                    public void onHttpResult(String result) {
+                        if (result != null) {
+                            Toast.makeText(context, R.string.confirmationSent, Toast.LENGTH_LONG);
+                            getMessages();
+                        }
+                    }
+                });
+    }
+
+    public void showOrderDialog(final Order order) {
+        SimpleDateFormat tf = new SimpleDateFormat("HH:mm");
+        String description = String.format("%s\n%s - %s\n%s (%s kn)",
+                order.proName,
+                tf.format(order.startTime),
+                tf.format(order.endTime),
+                order.serviceName,
+                order.servicePrice);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        String title = new SimpleDateFormat("d.M.yyyy.").format(order.date);
+        builder.setMessage(description);
+        if (order.providerConfirm.equals("1") && order.userConfirm.equals("0")) {
+            builder.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    sendConfirmation(order.id, "1");
+                }
+            });
+        }
+        if (!order.providerConfirm.equals("2") && !order.userConfirm.equals("2")) {
+            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    sendConfirmation(order.id, "2");
+                }
+            });
+        } else title += " - " + getString(R.string.canceled).toUpperCase();
+        builder.setNeutralButton(R.string.close, null);
+        builder.setTitle(title);
+        builder.show();
     }
 
     @SuppressLint("NewApi")
