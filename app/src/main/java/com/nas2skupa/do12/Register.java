@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -24,6 +25,7 @@ public class Register extends Activity {
     private EditText name;
     private EditText address;
     private EditText email;
+    private EditText phone;
     private EditText password;
     private EditText repeatPassword;
     private EditText code;
@@ -43,6 +45,7 @@ public class Register extends Activity {
         district = (Spinner) findViewById(R.id.district);
         address = (EditText) findViewById(R.id.address);
         email = (EditText) findViewById(R.id.email);
+        phone = (EditText) findViewById(R.id.phone);
         password = (EditText) findViewById(R.id.password);
         repeatPassword = (EditText) findViewById(R.id.repeat_password);
         repeatPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -67,6 +70,7 @@ public class Register extends Activity {
                     surname.getText().toString().isEmpty() ||
                     address.getText().toString().isEmpty() ||
                     email.getText().toString().isEmpty() ||
+                    phone.getText().toString().isEmpty() ||
                     password.getText().toString().isEmpty()) {
                     Toast toast = Toast.makeText(Register.this, R.string.mandatoryFields, Toast.LENGTH_SHORT);
                     toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
@@ -90,6 +94,7 @@ public class Register extends Activity {
                         .appendQueryParameter("city", curr_city.id)
                         .appendQueryParameter("address", address.getText().toString())
                         .appendQueryParameter("email", email.getText().toString())
+                        .appendQueryParameter("phone", phone.getText().toString())
                         .appendQueryParameter("password", password.getText().toString())
                         .appendQueryParameter("referral", code.getText().toString())
                         .appendQueryParameter("imei", imei)
@@ -98,9 +103,11 @@ public class Register extends Activity {
                         .setOnHttpResultListener(new HttpRequest.OnHttpResultListener() {
                             @Override
                             public void onHttpResult(String result) {
+                                Log.d("Response:",">"+result);
                                 if (result == null) return;
 
-                                Integer user_id = Integer.getInteger(result);
+                                Integer user_id = Integer.parseInt(result);
+                                Log.d("Response:","UserId:"+user_id);
                                 int message = R.string.serverError;
                                 if (user_id != null && user_id == 0) message = R.string.registrationUserExists;
                                 else if (user_id != null && user_id > 0) message = R.string.registrationComplete;
