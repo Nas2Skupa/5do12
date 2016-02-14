@@ -64,10 +64,8 @@ public class Notifications extends BaseActivity {
     private void getMessages() {
         final SharedPreferences prefs = getSharedPreferences("user", Context.MODE_PRIVATE);
         String userId = prefs.getString("id", "");
-        Uri uri = new Uri.Builder().encodedPath("http://nas2skupa.com/5do12/getOrders.aspx")
+        Uri uri = new Uri.Builder().encodedPath("http://nas2skupa.com/5do12/getNotifications.aspx")
                 .appendQueryParameter("userId", userId)
-                .appendQueryParameter("year", String.valueOf("2015"))
-                .appendQueryParameter("month", String.valueOf("7"))
                 .build();
         new HttpRequest(context, uri, false)
                 .setOnHttpResultListener(new HttpRequest.OnHttpResultListener() {
