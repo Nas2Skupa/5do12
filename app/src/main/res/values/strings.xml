@@ -78,5 +78,8 @@
     <string name="cancelSelected">Otkaži označene</string>
     <string name="ok">Ok</string>
     <string name="canceled">Otkazano</string>
+    <string name="confirmed">Potvrđeno</string>
+    <string name="waiting_confirmation_provider">Čeka potvrdu pružatelja usluge</string>
+    <string name="waiting_confirmation_user">Čeka tvoju potvrdu</string>
 
 </resources>

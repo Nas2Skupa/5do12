@@ -24,7 +24,7 @@ public class BaseActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        
+
         slide_me = new SimpleSideDrawer(this);
         slide_me.setRightBehindContentView(R.layout.sidemenu);
         TextView pocTV = (TextView) findViewById(R.id.pocetnabtn);

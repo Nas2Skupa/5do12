@@ -2,7 +2,6 @@ package com.nas2skupa.do12;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,8 +37,8 @@ public class NotificationsAdapter extends ArrayAdapter<Order>{
             holder = new NotificationsHolder();
             holder.provider = (TextView)row.findViewById(R.id.provider_name);
             holder.service = (TextView)row.findViewById(R.id.service_name);
-            holder.providerConfirm = (ImageView)row.findViewById(R.id.provider_confirm);
-            holder.userConfirm = (ImageView)row.findViewById(R.id.user_confirm);
+            holder.statusText = (TextView)row.findViewById(R.id.status_text);
+            holder.statusIcon = (ImageView)row.findViewById(R.id.status_icon);
             row.setTag(holder);
         }
         else
@@ -50,26 +49,34 @@ public class NotificationsAdapter extends ArrayAdapter<Order>{
         Order order = data.get(position);
         holder.provider.setText(order.proName);
         holder.service.setText(order.serviceName);
-        holder.providerConfirm.setImageResource(GetIcon(order.providerConfirm));
-        if (!order.providerConfirm.equals("2"))
-            holder.userConfirm.setImageResource(GetIcon(order.userConfirm));
+
+        if (order.userConfirm.equals("1") && order.providerConfirm.equals("1")) {
+            holder.statusText.setText(R.string.confirmed);
+            holder.statusIcon.setImageResource(R.drawable.ic_done_black_36px);
+        }
+        else if (order.userConfirm.equals("2") || order.providerConfirm.equals("2")) {
+            holder.statusText.setText(R.string.canceled);
+            holder.statusIcon.setImageResource(R.drawable.ic_clear_black_36px);
+        }
+        else {
+            if (order.providerConfirm.equals("0"))
+                holder.statusText.setText(R.string.waiting_confirmation_provider);
+            else
+                holder.statusText.setText(R.string.waiting_confirmation_user);
+
+            holder.statusIcon.setImageResource(R.drawable.ic_alarm_black_36px);
+        }
         holder.orderObj = order;
         row.setTag(holder);
         return row;
-    }
-
-    public int GetIcon(String confirm) {
-        if (confirm.equals("1")) return R.drawable.nar_potvrdi;
-        else if (confirm.equals("2")) return R.drawable.nar_odbij;
-        return R.drawable.nar_ponudi;
     }
 
     public static class NotificationsHolder
     {
         TextView provider;
         TextView service;
-        ImageView providerConfirm;
-        ImageView userConfirm;
+        TextView statusText;
+        ImageView statusIcon;
         Order orderObj;
     }
 }

@@ -305,6 +305,8 @@ public class Organizer extends BaseActivity implements OnClickListener {
         }
 
         private int getNumberOfDaysOfMonth(int i) {
+            // Prijestupna godina
+            if (i == 1 && year % 4 == 0) return 29;
             return daysOfMonth[i];
         }
 
