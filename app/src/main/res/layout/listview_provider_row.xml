@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical"
-    android:padding="10dp" >
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:orientation="vertical"
+              android:padding="10dp">
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
@@ -31,15 +32,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="#666666"
-                    android:layout_marginLeft="3dp"
                     android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    tools:text="Poliklinika Sunce"/>
                 <RatingBar
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="3dp"
                     android:id="@+id/ratingBar2"
                     style="?android:attr/ratingBarStyleSmall" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    tools:text="486 m"
+                    android:id="@+id/txtDistance"/>
             </LinearLayout>
         <LinearLayout
             android:layout_width="0dp"

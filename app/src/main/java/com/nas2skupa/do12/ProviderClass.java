@@ -1,5 +1,6 @@
 package com.nas2skupa.do12;
 
+import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -10,6 +11,7 @@ public class ProviderClass implements Parcelable {
     String proID ,proName, proFav,catID;
     int favIcon,akcijaIcon;
     float rating;
+    float latitude, longitude;
 
     @Override
     public int describeContents() {
@@ -25,9 +27,11 @@ public class ProviderClass implements Parcelable {
         dest.writeInt(favIcon);
         dest.writeInt(akcijaIcon);
         dest.writeFloat(rating);
+        dest.writeFloat(latitude);
+        dest.writeFloat(longitude);
     }
 
-    public ProviderClass(String sproId, String sproName, String sproFav, String catID, int ifavIcon, int iakcijaIcon, float frating){
+    public ProviderClass(String sproId, String sproName, String sproFav, String catID, int ifavIcon, int iakcijaIcon, float frating, float latitude, float longitude) {
         this.proID = sproId;
         this.proName = sproName;
         this.proFav = sproFav;
@@ -35,6 +39,8 @@ public class ProviderClass implements Parcelable {
         this.favIcon = ifavIcon;
         this.akcijaIcon = iakcijaIcon;
         this.rating = frating;
+        this.latitude = latitude;
+        this.longitude = longitude;
 
     }
     private ProviderClass(Parcel in){
@@ -45,6 +51,8 @@ public class ProviderClass implements Parcelable {
         this.favIcon = in.readInt();
         this.akcijaIcon = in.readInt();
         this.rating = in.readFloat();
+        this.latitude = in.readFloat();
+        this.longitude = in.readFloat();
     }
     public static final Parcelable.Creator<ProviderClass> CREATOR = new Parcelable.Creator<ProviderClass>() {
 
@@ -58,4 +66,11 @@ public class ProviderClass implements Parcelable {
             return new ProviderClass[size];
         }
     };
+
+    public Location getLocation() {
+        final Location location = new Location("");
+        location.setLatitude(latitude);
+        location.setLongitude(longitude);
+        return location;
+    }
 }

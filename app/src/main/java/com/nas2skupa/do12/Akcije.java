@@ -13,6 +13,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -26,7 +27,6 @@ import java.util.ArrayList;
 public class Akcije extends BaseActivity {
 
     private ListView listView1;
-    ArrayList<ProviderClass> listArray = new ArrayList<ProviderClass>();
     // URL to get contacts JSON
     private Uri baseUri = new Uri.Builder().encodedPath("http://nas2skupa.com/5do12/getAkc.aspx").build();
     // JSON Node names
@@ -40,6 +40,7 @@ public class Akcije extends BaseActivity {
     private Context context;
     private ProviderAdapter adapter;
     private SharedPreferences preferences;
+    private SortDialog sortDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,7 +50,7 @@ public class Akcije extends BaseActivity {
         context = this;
         header = getLayoutInflater().inflate(R.layout.listview_header_row, null);
         filter = getLayoutInflater().inflate(R.layout.listview_filter_row, null);
-        adapter = new ProviderAdapter(this, R.layout.listview_provider_row, listArray);
+        adapter = new ProviderAdapter(this, R.layout.listview_provider_row, new ArrayList<ProviderClass>());
         preferences = getSharedPreferences("user", Context.MODE_PRIVATE);
         getSubCatSettings("akcija", "#0090db", header);
 
@@ -64,8 +65,8 @@ public class Akcije extends BaseActivity {
                                     int position, long id) {
                 // getting values from selected ListItem
 
-                ProviderAdapter.ProviderHolder holder = (ProviderAdapter.ProviderHolder)view.getTag();
-                ProviderClass providerclass = (ProviderClass)holder.proObj;
+                ProviderAdapter.ProviderHolder holder = (ProviderAdapter.ProviderHolder) view.getTag();
+                ProviderClass providerclass = (ProviderClass) holder.proObj;
                 Bundle b = new Bundle();
                 b.putParcelable("providerclass", providerclass);
                 catSettings = getCatSett(Integer.parseInt(providerclass.catID));
@@ -77,7 +78,18 @@ public class Akcije extends BaseActivity {
             }
         });
 
-        CitiesFilter citiesFilter = new CitiesFilter(this, (Spinner) findViewById(R.id.cities), (Spinner) findViewById(R.id.districts),0);
+        sortDialog = new SortDialog(context, adapter);
+        sortDialog.showDiscountsFilter(false);
+        ImageView listSettingsBtn = (ImageView) findViewById(R.id.listSettingsBtn);
+        listSettingsBtn.setVisibility(View.VISIBLE);
+        listSettingsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sortDialog.show();
+            }
+        });
+
+        CitiesFilter citiesFilter = new CitiesFilter(this, (Spinner) findViewById(R.id.cities), (Spinner) findViewById(R.id.districts), 0);
         citiesFilter.setOnFilterChangedListener(new CitiesFilter.OnFilterChangedListener() {
             @Override
             public void onFilterChanged(String city, String district) {
@@ -102,10 +114,11 @@ public class Akcije extends BaseActivity {
     }
 
     private void parseServerResult(String result) {
-        listArray.clear();
         try {
             JSONObject jsonObj = new JSONObject(result);
             providers = jsonObj.getJSONArray(TAG_ARRAY);
+            ArrayList<ProviderClass> newList = new ArrayList<>();
+
             for (int i = 0; i < providers.length(); i++) {
                 JSONObject c = providers.getJSONObject(i);
                 String id = c.getString(TAG_ID);
@@ -113,6 +126,8 @@ public class Akcije extends BaseActivity {
                 String catID = c.getString(TAG_CAT);
                 String favore = c.getString("fav");
                 String action = c.getString("akcija");
+                double lat = c.optDouble("lat", 0);
+                double lon = c.optDouble("lon", 0);
                 int fav = R.drawable.blank;
                 int akcija = R.drawable.blank;
                 if (favore.equals("1")) {
@@ -126,14 +141,18 @@ public class Akcije extends BaseActivity {
                     rating = Float.parseFloat(c.getString("rating"));
                 } catch (NumberFormatException e) {
                 }
-                ProviderClass currProvider = new ProviderClass(id, name, favore, catID, fav, akcija, rating);
-                listArray.add(currProvider);
+                ProviderClass currProvider = new ProviderClass(id, name, favore, catID, fav, akcija, rating, (float) lat, (float) lon);
+                newList.add(currProvider);
             }
+            adapter.clear();
+            adapter.addAll(newList);
+            adapter.filterDiscounts(sortDialog.shouldFilterDiscounts());
+            adapter.sortBy(sortDialog.getSortType());
+            adapter.notifyDataSetChanged();
         } catch (JSONException e) {
             Log.e("ActionHttpRequest", "Error parsing server data.");
             e.printStackTrace();
         }
-        listView1.setAdapter(adapter);
     }
 
     @SuppressLint("NewApi")

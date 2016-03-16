@@ -81,5 +81,6 @@
     <string name="confirmed">Potvrđeno</string>
     <string name="waiting_confirmation_provider">Čeka potvrdu pružatelja usluge</string>
     <string name="waiting_confirmation_user">Čeka tvoju potvrdu</string>
+    <string name="msg_location_unknown_long">Nažalost vaša je lokacija trenutno nepoznata pa sortiranje po udaljenosti nije moguće..</string>
 
 </resources>

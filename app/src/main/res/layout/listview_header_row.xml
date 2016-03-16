@@ -32,6 +32,7 @@
         android:paddingRight="15dp"
         android:id="@+id/listSettingsBtn"
         android:layout_marginRight="5dp"
-        android:visibility="invisible" />
+        android:visibility="visible"
+        />
 
 </LinearLayout>

@@ -1,10 +1,7 @@
 package com.nas2skupa.do12;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -16,12 +13,8 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.RadioGroup;
-import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -30,15 +23,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Stack;
 
 public class ProviderList extends BaseActivity {
 
     private ListView listView1;
-    public RatingBar rating;
-    private ProgressDialog pDialog;
-    ArrayList<ProviderClass> listArray = new ArrayList<ProviderClass>();
     // URL to get contacts JSON
     private Uri baseUri = new Uri.Builder().encodedPath("http://nas2skupa.com/5do12/getPro.aspx").build();
     private String subcategoryId;
@@ -51,10 +39,12 @@ public class ProviderList extends BaseActivity {
     JSONArray providers = null;
     View header = null;
     View filter = null;
-    ImageView listSettingsBtn;
     private Context context;
     private ProviderAdapter adapter;
     private SharedPreferences preferences;
+
+    private SortDialog sortDialog;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -68,7 +58,7 @@ public class ProviderList extends BaseActivity {
         context = this;
         header = getLayoutInflater().inflate(R.layout.listview_header_row, null);
         filter = getLayoutInflater().inflate(R.layout.listview_filter_row, null);
-        adapter = new ProviderAdapter(this, R.layout.listview_provider_row, listArray);
+        adapter = new ProviderAdapter(this, R.layout.listview_provider_row, new ArrayList<ProviderClass>());
         preferences = getSharedPreferences("user", Context.MODE_PRIVATE);
         getSubCatSettings(subcat, color, header);
 
@@ -94,12 +84,13 @@ public class ProviderList extends BaseActivity {
             }
         });
 
-        listSettingsBtn = (ImageView) findViewById(R.id.listSettingsBtn);
+        sortDialog = new SortDialog(context, adapter);
+        ImageView listSettingsBtn = (ImageView) findViewById(R.id.listSettingsBtn);
         listSettingsBtn.setVisibility(View.VISIBLE);
         listSettingsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showListSettingDialog();
+                sortDialog.show();
             }
         });
 
@@ -128,75 +119,20 @@ public class ProviderList extends BaseActivity {
         });
     }
 
-    private Stack<Integer> checkedItems = new Stack<Integer>();
-
-    public void showListSettingDialog() {
-        AlertDialog dialog = new AlertDialog.Builder(context)
-                .setTitle("Poredaj pružatelje usluga")
-                .setView(getLayoutInflater().inflate(R.layout.list_settings, null))
-                .setPositiveButton("Primjeni", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, int which) {
-                        checkedItems.clear();
-                        CheckBox actions = (CheckBox) ((AlertDialog) dialog).findViewById(R.id.akcijeChbox);
-                        if (actions.isChecked()) {
-                            ArrayList<ProviderClass> filteredList = new ArrayList<ProviderClass>();
-                            for (ProviderClass provider : listArray)
-                                if (provider.akcijaIcon == R.drawable.akcija_icon)
-                                    filteredList.add(provider);
-                            adapter = new ProviderAdapter(context, R.layout.listview_provider_row, filteredList);
-                            checkedItems.push(R.id.akcijeChbox);
-                        } else
-                            adapter = new ProviderAdapter(context, R.layout.listview_provider_row, listArray);
-
-                        RadioGroup radioGroup = (RadioGroup) ((AlertDialog) dialog).findViewById(R.id.sortGrp);
-                        switch (radioGroup.getCheckedRadioButtonId()) {
-                            case R.id.nazivRbtn:
-                                adapter.sort(new Comparator<ProviderClass>() {
-                                    public int compare(ProviderClass o1, ProviderClass o2) {
-                                        return o1.proName.compareTo(o2.proName);
-                                    }
-                                });
-                                checkedItems.push(R.id.nazivRbtn);
-                                break;
-                            case R.id.najnovijeRbtn:
-                                adapter.sort(new Comparator<ProviderClass>() {
-                                    public int compare(ProviderClass o1, ProviderClass o2) {
-                                        return Integer.valueOf(o2.proID) - Integer.valueOf(o1.proID);
-                                    }
-                                });
-                                checkedItems.push(R.id.najnovijeRbtn);
-                                break;
-                            case R.id.ocjeneRbtn:
-                                adapter.sort(new Comparator<ProviderClass>() {
-                                    public int compare(ProviderClass o1, ProviderClass o2) {
-                                        if (o2.rating > o1.rating) return 1;
-                                        else if (o2.rating < o1.rating) return -1;
-                                        else return 0;
-                                    }
-                                });
-                                checkedItems.push(R.id.ocjeneRbtn);
-                                break;
-                        }
-                        listView1.setAdapter(adapter);
-                    }
-                })
-                .setNegativeButton(R.string.close, null)
-                .show();
-        for (int id : checkedItems)
-            ((CompoundButton) dialog.findViewById(id)).setChecked(true);
-    }
-
     private void parseServerResult(String result) {
-        listArray.clear();
         try {
             JSONObject jsonObj = new JSONObject(result);
             providers = jsonObj.getJSONArray(TAG_ARRAY);
+            ArrayList<ProviderClass> newList = new ArrayList<>();
+
             for (int i = 0; i < providers.length(); i++) {
                 JSONObject c = providers.getJSONObject(i);
                 String id = c.getString(TAG_ID);
                 String name = c.getString(TAG_NAME);
                 String favore = c.getString("favorite");
                 String action = c.getString("akcija");
+                double lat = c.optDouble("lat", 0);
+                double lon = c.optDouble("lon", 0);
                 int fav = R.drawable.blank;
                 int akcija = R.drawable.blank;
                 if (favore.equals("1")) {
@@ -210,14 +146,18 @@ public class ProviderList extends BaseActivity {
                     rating = Float.parseFloat(c.getString("rating"));
                 } catch (NumberFormatException e) {
                 }
-                ProviderClass currProvider = new ProviderClass(id, name, favore, null, fav, akcija, rating);
-                listArray.add(currProvider);
+                ProviderClass currProvider = new ProviderClass(id, name, favore, null, fav, akcija, rating, (float) lat, (float) lon);
+                newList.add(currProvider);
             }
+            adapter.clear();
+            adapter.addAll(newList);
+            adapter.filterDiscounts(sortDialog.shouldFilterDiscounts());
+            adapter.sortBy(sortDialog.getSortType());
+            adapter.notifyDataSetChanged();
         } catch (JSONException e) {
             Log.e("ProviderListHttpRequest", "Error parsing server data.");
             e.printStackTrace();
         }
-        listView1.setAdapter(adapter);
     }
 
     @SuppressLint("NewApi")

@@ -120,6 +120,8 @@ public class SearchActivity extends BaseActivity {
                 String catID = c.getString("category");
                 String favore = c.getString("favorite");
                 String action = c.getString("akcija");
+                double lat = c.optDouble("lat", 0);
+                double lon = c.optDouble("lon", 0);
                 int fav = R.drawable.blank;
                 int akcija = R.drawable.blank;
                 if (favore.equals("1")) {
@@ -133,7 +135,7 @@ public class SearchActivity extends BaseActivity {
                     rating = Float.parseFloat(c.getString("rating"));
                 } catch (NumberFormatException e) {
                 }
-                ProviderClass currProvider = new ProviderClass(id, name, favore, catID, fav, akcija, rating);
+                ProviderClass currProvider = new ProviderClass(id, name, favore, catID, fav, akcija, rating, (float) lat, (float) lon);
                 listArray.add(currProvider);
             }
         } catch (JSONException e) {
